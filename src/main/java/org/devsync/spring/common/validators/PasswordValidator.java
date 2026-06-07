@@ -12,7 +12,7 @@ public class PasswordValidator implements ConstraintValidator<ValidPassword,Stri
             return false;
         }
         return password.matches(
-                "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!])$"
+                "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).*$"
         );
     }
 }

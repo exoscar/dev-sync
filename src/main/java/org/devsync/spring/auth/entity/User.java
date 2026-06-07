@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.devsync.spring.common.entity.BaseEntity;
+import org.devsync.spring.user.entity.Role;
 
 import java.util.UUID;
 
@@ -27,4 +28,8 @@ public class User extends BaseEntity {
 
     @Column(name = "password",nullable = false)
     private String password;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 }

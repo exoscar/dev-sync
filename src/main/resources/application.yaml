@@ -20,5 +20,7 @@ spring:
           batch_size: 50
         order_updates: true
 
-kind: Application
-
+app:
+  jwt:
+    secret: ReplaceThisWithVeryLongSecure256BitSecretKeyValue
+    expiration-ms: 900000

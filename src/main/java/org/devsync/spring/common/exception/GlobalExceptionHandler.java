@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -44,6 +46,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiError> handleBusinessException(BusinessException e){
     return buildResponse(e.getMessage(),e.getErrorCode(),Collections.emptyList());
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiError> handleNoResourceFound(
+            NoResourceFoundException e) {
+
+        log.warn("Resource not found: {}", e.getResourcePath());
+
+        return buildResponse(
+                "Requested resource not found",
+                ErrorCode.NOT_FOUND,
+                Collections.emptyList()
+        );
     }
 
     @ExceptionHandler(Exception.class)
