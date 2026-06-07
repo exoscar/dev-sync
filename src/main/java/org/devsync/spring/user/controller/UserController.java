@@ -26,22 +26,22 @@ public class UserController {
 
     @GetMapping
     public ApiResponse<Page<UserResponse>> getAllUsers(
-            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE+"") int page,
-            @RequestParam(defaultValue = AppConstants.DEFAULT_SIZE+"") int size
-    ){
-        Page<UserResponse> users = userService.getAllUsers(page,size);
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE + "") int page,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_SIZE + "") int size
+    ) {
+        Page<UserResponse> users = userService.getAllUsers(page, size);
         return ApiResponseUtil.success(users);
     }
 
     @PutMapping("/{id}/role")
     public ApiResponse<UserResponse> updateRole(@Valid @RequestBody UpdateRoleRequest request,
-                                                @PathVariable String id){
-    UserResponse userResponse = userService.updateRole(id,request);
-    return ApiResponseUtil.success(userResponse,"Role Updated Successfully");
+                                                @PathVariable String id) {
+        UserResponse userResponse = userService.updateRole(id, request);
+        return ApiResponseUtil.success(userResponse, "Role Updated Successfully");
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<UserResponse> getUserById(@PathVariable String id){
+    public ApiResponse<UserResponse> getUserById(@PathVariable String id) {
         UserResponse userResponse = userService.getUserById(id);
         return ApiResponseUtil.success(userResponse);
     }
