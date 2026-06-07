@@ -3,36 +3,46 @@ package org.devsync.spring.user.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.devsync.spring.auth.dto.LoginRequest;
-import org.devsync.spring.auth.dto.LoginResponse;
+import org.devsync.spring.auth.entity.User;
+import org.devsync.spring.common.constants.AppConstants;
 import org.devsync.spring.common.response.ApiResponse;
 import org.devsync.spring.common.security.CurrentUserService;
-import org.devsync.spring.common.security.CustomUserDetails;
-import org.devsync.spring.common.security.CustomUserDetailsService;
 import org.devsync.spring.common.util.ApiResponseUtil;
 import org.devsync.spring.user.dto.CurrentUserResponse;
+import org.devsync.spring.user.dto.UpdateRoleRequest;
+import org.devsync.spring.user.dto.UserResponse;
+import org.devsync.spring.user.service.UserService;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 public class UserController {
 
-    private final CurrentUserService currentUserService;
+    private final UserService userService;
 
-    @GetMapping("/me")
-    public ApiResponse<CurrentUserResponse> greet(){
-        CurrentUserResponse res = currentUserService.getCurrentUserResponse();
-        return ApiResponseUtil.success(res,"User Logged In");
+    @GetMapping
+    public ApiResponse<Page<UserResponse>> getAllUsers(
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE+"") int page,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_SIZE+"") int size
+    ){
+        Page<UserResponse> users = userService.getAllUsers(page,size);
+        return ApiResponseUtil.success(users);
     }
 
-    @GetMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String admin(){
-        return "admin accessed";
+    @PutMapping("/{id}/role")
+    public ApiResponse<UserResponse> updateRole(@Valid @RequestBody UpdateRoleRequest request,
+                                                @PathVariable String id){
+    UserResponse userResponse = userService.updateRole(id,request);
+    return ApiResponseUtil.success(userResponse,"Role Updated Successfully");
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<UserResponse> getUserById(@PathVariable String id){
+        UserResponse userResponse = userService.getUserById(id);
+        return ApiResponseUtil.success(userResponse);
     }
 }

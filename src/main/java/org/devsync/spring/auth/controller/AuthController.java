@@ -8,7 +8,9 @@ import org.devsync.spring.auth.dto.RegisterRequest;
 import org.devsync.spring.auth.dto.RegisterResponse;
 import org.devsync.spring.auth.service.AuthService;
 import org.devsync.spring.common.response.ApiResponse;
+import org.devsync.spring.common.security.CurrentUserService;
 import org.devsync.spring.common.util.ApiResponseUtil;
+import org.devsync.spring.user.dto.CurrentUserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,5 +32,4 @@ public class AuthController {
         LoginResponse response = authService.loginUser(loginRequest);
         return ApiResponseUtil.success(response,"User Logged In");
     }
-
 }

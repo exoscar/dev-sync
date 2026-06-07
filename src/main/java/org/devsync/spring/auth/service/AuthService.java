@@ -12,6 +12,8 @@ import org.devsync.spring.auth.repository.UserRepository;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
 import org.devsync.spring.common.security.JwtService;
+import org.devsync.spring.user.entity.Role;
+import org.devsync.spring.user.repository.RoleRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -33,19 +36,25 @@ public class AuthService {
             log.warn("Register Failed: email={} already exists", email);
             throw new BusinessException("Email already Exists", ErrorCode.USER_EMAIL_ALREADY_EXISTS);
         }
+        Role role = roleRepository.findByRole(request.getRole()).orElseThrow(
+                ()-> new BusinessException("Role Not Found", ErrorCode.NOT_FOUND)
+        );
         String password = passwordEncoder.encode(request.getPassword());
+
 
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(password);
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
+        user.setRole(role);
         user = userRepository.save(user);
         String token = jwtService.generateAccessToken(user.getId());
         return RegisterResponse.builder()
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .id(user.getId())
+                .role(role.getRole())
                 .email(user.getEmail()).token(token).build();
 
     }
