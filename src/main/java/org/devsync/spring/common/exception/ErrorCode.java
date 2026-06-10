@@ -10,7 +10,10 @@ public enum ErrorCode {
     VALIDATION_ERROR(HttpStatus.BAD_REQUEST),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR),
     USER_EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT),
+    WORKSPACE_NAME_ALREADY_EXISTS(HttpStatus.CONFLICT),
+    FORBIDDEN(HttpStatus.FORBIDDEN),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED);
+
 
     private final HttpStatus status;
 

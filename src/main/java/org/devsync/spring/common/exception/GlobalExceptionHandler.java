@@ -5,6 +5,7 @@ import org.devsync.spring.common.response.FieldValidationError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -41,6 +42,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleBadRequest(BadRequestException e) {
         ErrorCode errorCode = ErrorCode.BAD_REQUEST;
         return buildResponse("Bad request", errorCode, Collections.emptyList());
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ApiError> handleAccessDenied(
+            AuthorizationDeniedException ex
+    ) {
+        return buildResponse(
+                "Access Denied",
+                ErrorCode.FORBIDDEN,
+                Collections.emptyList()
+        );
     }
 
     @ExceptionHandler(BusinessException.class)

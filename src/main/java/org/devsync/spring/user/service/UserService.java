@@ -6,6 +6,7 @@ import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.auth.repository.UserRepository;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
+import org.devsync.spring.common.util.Utils;
 import org.devsync.spring.user.dto.UpdateRoleRequest;
 import org.devsync.spring.user.dto.UserResponse;
 import org.devsync.spring.user.entity.Role;
@@ -35,7 +36,7 @@ public class UserService {
 
     @Transactional
     public UserResponse updateRole(String id, @Valid UpdateRoleRequest request) {
-        UUID userId = parseUserId(id);
+        UUID userId = Utils.parseUuid(id,"Invalid User Id");
         User user = getUserById(userId);
         Role role = roleRepository.findByRole(request.getRole()).orElseThrow(
                 ()-> new BusinessException("Role Not Found", ErrorCode.NOT_FOUND)
@@ -45,7 +46,7 @@ public class UserService {
     }
 
     public UserResponse getUserById(String id) {
-        UUID userId = parseUserId(id);
+        UUID userId = Utils.parseUuid(id,"Invalid User Id");
         return mapToResponse(getUserById(userId));
     }
 
@@ -69,16 +70,7 @@ public class UserService {
                 );
     }
 
-    private UUID parseUserId(String id) {
-        try {
-            return UUID.fromString(id);
-        } catch (IllegalArgumentException ex) {
-            throw new BusinessException(
-                    "Invalid User Id",
-                    ErrorCode.BAD_REQUEST
-            );
-        }
-    }
+
 
 
 }
