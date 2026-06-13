@@ -26,6 +26,9 @@ public class Issue extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private IssueStatus status;
 
+    @Enumerated(EnumType.STRING)
+    private IssuePriority priority;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "project_id")
     private Project project;

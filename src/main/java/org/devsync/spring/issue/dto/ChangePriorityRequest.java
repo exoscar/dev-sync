@@ -5,14 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
+import org.devsync.spring.issue.entity.IssuePriority;
 
 @Data
+@AllArgsConstructor
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
-public class AssignIssueRequest {
+public class ChangePriorityRequest {
     @NotNull
-    private UUID userId;
+    private IssuePriority issuePriority;
 }

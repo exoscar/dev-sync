@@ -11,8 +11,11 @@ import org.devsync.spring.common.security.CurrentUserService;
 import org.devsync.spring.common.util.Utils;
 import org.devsync.spring.issue.dto.*;
 import org.devsync.spring.issue.entity.Issue;
+import org.devsync.spring.issue.entity.IssuePriority;
 import org.devsync.spring.issue.entity.IssueStatus;
 import org.devsync.spring.issue.repository.IssueRepository;
+import org.devsync.spring.issue.specification.IssueSpecification;
+import org.devsync.spring.project.dto.UpdateProjectRequest;
 import org.devsync.spring.project.entity.Project;
 import org.devsync.spring.project.repository.ProjectRepository;
 import org.devsync.spring.workspace.entity.Workspace;
@@ -22,6 +25,7 @@ import org.devsync.spring.workspace.repository.WorkspaceMemberRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +54,7 @@ public class IssueService {
         issue.setDescription(request.getDescription().trim());
         issue.setStatus(IssueStatus.TODO);
         issue.setProject(project);
+        issue.setPriority(request.getPriority());
         issueRepository.save(issue);
 
         issueActivityService.recordActivity(issue,
@@ -60,11 +65,21 @@ public class IssueService {
         return mapToIssueResponse(issue);
     }
 
-    public Page<IssueResponse> getAllIssues(String projectId, int page, int size) {
+    public Page<IssueResponse> getAllIssues(String projectId, int page, int size,IssueFilterRequest filterRequest) {
         UUID projectUUID = parseProjectId(projectId);
         getCurrentProjectMember(projectUUID);
-        PageRequest pageable = PageRequest.of(page, size, Sort.by("id"));
-        Page<Issue> issues = issueRepository.findByProjectId(projectUUID, pageable);
+        Specification<Issue> spec = IssueSpecification.hasProject(projectUUID);
+        if(filterRequest.getStatus() != null){
+            spec = spec.and(IssueSpecification.hasStatus(filterRequest.getStatus()));
+        }
+        if(filterRequest.getPriority() != null){
+            spec = spec.and(IssueSpecification.hasPriority(filterRequest.getPriority()));
+        }
+        if(filterRequest.getAssigneeId()!=null){
+            spec = spec.and(IssueSpecification.hasAssignee(filterRequest.getAssigneeId()));
+        }
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Issue> issues =issueRepository.findAll(spec,pageable);
         return issues.map(this::mapToIssueResponse);
     }
 
@@ -175,6 +190,45 @@ public class IssueService {
         return mapToIssueResponse(issue);
     }
 
+    @Transactional
+    public IssueResponse changePriority(String projectId, String issueId, ChangePriorityRequest request) {
+        UUID projectUUID = parseProjectId(projectId);
+        UUID issueUUID = parseIssueId(issueId);
+        WorkspaceMember member = getCurrentProjectMember(projectUUID);
+        if (!canUpdateIssue(member.getRole())) {
+            throw new BusinessException("Access Denied: You can not update issue status", ErrorCode.FORBIDDEN);
+        }
+        Issue issue = getIssue(projectUUID, issueUUID);
+        IssuePriority oldPriority = issue.getPriority();
+        if(issue.getPriority() == request.getIssuePriority()){
+            throw new BusinessException(
+                    "Priority cannot be same",
+                    ErrorCode.BAD_REQUEST
+            );
+        }
+        issue.setPriority(request.getIssuePriority());
+        issueActivityService.recordActivity(issue,member.getUser(),ActivityType.ISSUE_PRIORITY_CHANGED,"Priority changed from "+
+                oldPriority +" to "+request.getIssuePriority());
+
+        return mapToIssueResponse(issue);
+    }
+
+    public ProjectStatsResponse getProjectStats(String projectId) {
+        UUID projectUUID = parseProjectId(projectId);
+        getCurrentProjectMember(projectUUID);
+        return ProjectStatsResponse.builder()
+                .totalIssues(issueRepository.countByProjectId(projectUUID))
+                .todoIssues(issueRepository.countByProjectIdAndStatus(projectUUID, IssueStatus.TODO))
+                .inProgressIssues(issueRepository.countByProjectIdAndStatus(projectUUID,IssueStatus.IN_PROGRESS))
+                .doneIssues(issueRepository.countByProjectIdAndStatus(projectUUID,IssueStatus.DONE))
+                .lowPriority(issueRepository.countByProjectIdAndPriority(projectUUID,IssuePriority.LOW))
+                .mediumPriority(issueRepository.countByProjectIdAndPriority(projectUUID,IssuePriority.MEDIUM))
+                .highPriority(issueRepository.countByProjectIdAndPriority(projectUUID,IssuePriority.HIGH))
+                .criticalPriority(issueRepository.countByProjectIdAndPriority(projectUUID,IssuePriority.CRITICAL))
+                .assignedIssues(issueRepository.countByProjectIdAndAssigneeIsNotNull(projectUUID))
+                .unassignedIssues(issueRepository.countByProjectIdAndAssigneeIsNull(projectUUID)).build();
+    }
+
 
     private IssueResponse mapToIssueResponse(Issue issue) {
         User assignee = issue.getAssignee();
@@ -185,6 +239,7 @@ public class IssueService {
                 .status(issue.getStatus())
                 .projectId(issue.getProject().getId())
                 .projectName(issue.getProject().getName())
+                .priority(issue.getPriority())
                 .assigneeId(
                         assignee != null ? assignee.getId() : null
                 )
@@ -241,4 +296,7 @@ public class IssueService {
                 () -> new BusinessException("Access Denied: You do not have access to this workspace", ErrorCode.FORBIDDEN)
         );
     }
+
+
+
 }

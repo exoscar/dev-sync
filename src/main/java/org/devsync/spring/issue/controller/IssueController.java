@@ -6,9 +6,14 @@ import org.devsync.spring.common.constants.AppConstants;
 import org.devsync.spring.common.response.ApiResponse;
 import org.devsync.spring.common.util.ApiResponseUtil;
 import org.devsync.spring.issue.dto.*;
+import org.devsync.spring.issue.entity.IssuePriority;
+import org.devsync.spring.issue.entity.IssueStatus;
 import org.devsync.spring.issue.service.IssueService;
+import org.devsync.spring.project.dto.UpdateProjectRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,10 +31,17 @@ public class IssueController {
 
     @GetMapping
     public ApiResponse<Page<IssueResponse>> getAllIssues(@PathVariable String projectId,
+                                                         @RequestParam(required = false)
+                                                         IssueStatus status,
+                                                         @RequestParam(required = false)
+                                                             IssuePriority priority,
+                                                         @RequestParam(required = false)
+                                                             UUID assigneeId,
                                                          @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE+"") int page,
                                                          @RequestParam(defaultValue = AppConstants.DEFAULT_SIZE+"") int size
                                                          ){
-        Page<IssueResponse> responses =issueService.getAllIssues(projectId,page,size);
+        IssueFilterRequest filterRequest = IssueFilterRequest.builder().status(status).priority(priority).assigneeId(assigneeId).build();
+        Page<IssueResponse> responses =issueService.getAllIssues(projectId,page,size,filterRequest);
         return ApiResponseUtil.success(responses);
     }
 
@@ -59,10 +71,23 @@ public class IssueController {
         return ApiResponseUtil.success(response,"User assigned to Issue");
     }
 
+    @PatchMapping("/{issueId}/priority")
+    private ApiResponse<IssueResponse> updatePriority(@PathVariable String projectId, @PathVariable String issueId,
+                                                      @Valid @RequestBody ChangePriorityRequest request){
+        IssueResponse response = issueService.changePriority(projectId,issueId,request);
+        return ApiResponseUtil.success(response,"Priority change successful");
+    }
+
     @DeleteMapping("{issueId}")
     public ApiResponse<Void> deleteIssue(@PathVariable String projectId,@PathVariable String issueId){
          issueService.deleteIssue(projectId,issueId);
         return ApiResponseUtil.success("Issue deletion successful");
+    }
+
+    @GetMapping("/stats")
+    public ApiResponse<ProjectStatsResponse> getProjectStats(@PathVariable String projectId){
+        ProjectStatsResponse statsResponse = issueService.getProjectStats(projectId);
+        return ApiResponseUtil.success(statsResponse);
     }
 
 

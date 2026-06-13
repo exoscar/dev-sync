@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.devsync.spring.issue.entity.IssuePriority;
 import org.devsync.spring.issue.entity.IssueStatus;
 
 import java.util.UUID;
@@ -17,6 +18,7 @@ public class IssueResponse {
     private String title;
     private String description;
     private IssueStatus status;
+    private IssuePriority priority;
 
     private UUID projectId;
     private String projectName;
