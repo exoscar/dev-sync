@@ -7,6 +7,8 @@ import org.devsync.spring.common.response.ApiResponse;
 import org.devsync.spring.common.util.ApiResponseUtil;
 import org.devsync.spring.issue.dto.CreateIssueRequest;
 import org.devsync.spring.issue.dto.IssueResponse;
+import org.devsync.spring.issue.dto.UpdateIssueRequest;
+import org.devsync.spring.issue.dto.UpdateStatusRequest;
 import org.devsync.spring.issue.service.IssueService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -39,5 +41,26 @@ public class IssueController {
         IssueResponse response = issueService.getIssueById(projectId,issueId);
         return ApiResponseUtil.success(response);
     }
+
+    @PutMapping("/{issueId}")
+    public ApiResponse<IssueResponse> updateIssue(@PathVariable String projectId, @PathVariable String issueId,
+                                                  @Valid @RequestBody UpdateIssueRequest request){
+        IssueResponse response = issueService.updateIssue(projectId,issueId,request);
+        return ApiResponseUtil.success(response,"Issue updated successful");
+    }
+
+    @PatchMapping("/{issueId}/status")
+    public ApiResponse<IssueResponse> updateStatus(@PathVariable String projectId, @PathVariable String issueId,
+                                                   @Valid @RequestBody UpdateStatusRequest request){
+        IssueResponse response = issueService.updateStatus(projectId,issueId,request);
+        return ApiResponseUtil.success(response,"Status updated successful");
+    }
+
+    @DeleteMapping("{issueId}")
+    public ApiResponse<Void> deleteIssue(@PathVariable String projectId,@PathVariable String issueId){
+         issueService.deleteIssue(projectId,issueId);
+        return ApiResponseUtil.success("Issue deletion successful");
+    }
+
 
 }
