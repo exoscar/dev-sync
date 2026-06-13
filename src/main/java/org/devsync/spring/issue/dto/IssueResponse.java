@@ -20,4 +20,7 @@ public class IssueResponse {
 
     private UUID projectId;
     private String projectName;
+
+    private UUID assigneeId;
+    private String assigneeEmail;
 }

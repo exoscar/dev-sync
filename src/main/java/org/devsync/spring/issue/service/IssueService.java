@@ -2,14 +2,12 @@ package org.devsync.spring.issue.service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
 import org.devsync.spring.common.security.CurrentUserService;
 import org.devsync.spring.common.util.Utils;
-import org.devsync.spring.issue.dto.CreateIssueRequest;
-import org.devsync.spring.issue.dto.IssueResponse;
-import org.devsync.spring.issue.dto.UpdateIssueRequest;
-import org.devsync.spring.issue.dto.UpdateStatusRequest;
+import org.devsync.spring.issue.dto.*;
 import org.devsync.spring.issue.entity.Issue;
 import org.devsync.spring.issue.entity.IssueStatus;
 import org.devsync.spring.issue.repository.IssueRepository;
@@ -41,10 +39,10 @@ public class IssueService {
         UUID projectUUID = parseProjectId(projectId);
         Project project = getProjectById(projectUUID);
         WorkspaceMember member = getCurrentProjectMember(project);
-        if(!canCreateIssue(member.getRole())){
-            throw new BusinessException("Access Denied: You cannot create issue",ErrorCode.FORBIDDEN);
+        if (!canCreateIssue(member.getRole())) {
+            throw new BusinessException("Access Denied: You cannot create issue", ErrorCode.FORBIDDEN);
         }
-        Issue issue =  new Issue();
+        Issue issue = new Issue();
         issue.setTitle(request.getTitle().trim());
         issue.setDescription(request.getDescription().trim());
         issue.setStatus(IssueStatus.TODO);
@@ -53,37 +51,34 @@ public class IssueService {
         return mapToIssueResponse(issue);
     }
 
-    public Page<IssueResponse> getAllIssues(String projectId,int page,int size) {
+    public Page<IssueResponse> getAllIssues(String projectId, int page, int size) {
         UUID projectUUID = parseProjectId(projectId);
         getCurrentProjectMember(projectUUID);
-        PageRequest pageable = PageRequest.of(page,size, Sort.by("id"));
-        Page<Issue> issues = issueRepository.findByProjectId(projectUUID,pageable);
+        PageRequest pageable = PageRequest.of(page, size, Sort.by("id"));
+        Page<Issue> issues = issueRepository.findByProjectId(projectUUID, pageable);
 
         return issues.map(this::mapToIssueResponse);
+    }
+
+    @Transactional
+    public IssueResponse updateIssue(String projectId, String issueId, UpdateIssueRequest request) {
+        UUID projectUUID = parseProjectId(projectId);
+        UUID issueUUID = parseIssueId(issueId);
+        WorkspaceMember member = getCurrentProjectMember(projectUUID);
+        if (!canUpdateIssue(member.getRole())) {
+            throw new BusinessException("Access Denied: You can not update issue", ErrorCode.FORBIDDEN);
+        }
+        Issue issue = getIssue(projectUUID, issueUUID);
+        issue.setTitle(request.getTitle().trim());
+        issue.setDescription(request.getDescription().trim());
+        return mapToIssueResponse(issue);
     }
 
     public IssueResponse getIssueById(String projectId, String issueId) {
         UUID projectUUID = parseProjectId(projectId);
         UUID issueUUID = parseIssueId(issueId);
         getCurrentProjectMember(projectUUID);
-        Issue issue = issueRepository.findByProjectIdAndId(projectUUID,issueUUID).orElseThrow(
-                ()-> new BusinessException("Issue not found",ErrorCode.NOT_FOUND)
-        );
-        return mapToIssueResponse(issue);
-    }
-    @Transactional
-    public IssueResponse updateIssue(String projectId, String issueId, UpdateIssueRequest request) {
-        UUID projectUUID = parseProjectId(projectId);
-        UUID issueUUID = parseIssueId(issueId);
-        WorkspaceMember member = getCurrentProjectMember(projectUUID);
-        if(!canUpdateIssue(member.getRole())){
-            throw new BusinessException("Access Denied: You can not update issue",ErrorCode.FORBIDDEN);
-        }
-        Issue issue = issueRepository.findByProjectIdAndId(projectUUID,issueUUID).orElseThrow(
-                ()-> new BusinessException("Issue not found",ErrorCode.NOT_FOUND)
-        );
-        issue.setTitle(request.getTitle().trim());
-        issue.setDescription(request.getDescription().trim());
+        Issue issue = getIssue(projectUUID, issueUUID);
         return mapToIssueResponse(issue);
     }
 
@@ -92,14 +87,12 @@ public class IssueService {
         UUID projectUUID = parseProjectId(projectId);
         UUID issueUUID = parseIssueId(issueId);
         WorkspaceMember member = getCurrentProjectMember(projectUUID);
-        if(!canUpdateIssue(member.getRole())){
-            throw new BusinessException("Access Denied: You can not update issue status",ErrorCode.FORBIDDEN);
+        if (!canUpdateIssue(member.getRole())) {
+            throw new BusinessException("Access Denied: You can not update issue status", ErrorCode.FORBIDDEN);
         }
-        Issue issue = issueRepository.findByProjectIdAndId(projectUUID,issueUUID).orElseThrow(
-                ()-> new BusinessException("Issue not found",ErrorCode.NOT_FOUND)
-        );
-        if(issue.getStatus() == request.getStatus()){
-            throw new BusinessException("Status can not be same",ErrorCode.BAD_REQUEST);
+        Issue issue = getIssue(projectUUID, issueUUID);
+        if (issue.getStatus() == request.getStatus()) {
+            throw new BusinessException("Status can not be same", ErrorCode.BAD_REQUEST);
         }
         issue.setStatus(request.getStatus());
         return mapToIssueResponse(issue);
@@ -110,17 +103,53 @@ public class IssueService {
         UUID projectUUID = parseProjectId(projectId);
         UUID issueUUID = parseIssueId(issueId);
         WorkspaceMember member = getCurrentProjectMember(projectUUID);
-        if(!canDeleteIssue(member.getRole())){
-            throw new BusinessException("Access Denied: You can not delete issue",ErrorCode.FORBIDDEN);
+        if (!canDeleteIssue(member.getRole())) {
+            throw new BusinessException("Access Denied: You can not delete issue", ErrorCode.FORBIDDEN);
         }
-        Issue issue = issueRepository.findByProjectIdAndId(projectUUID,issueUUID).orElseThrow(
-                ()-> new BusinessException("Issue not found",ErrorCode.NOT_FOUND)
-        );
+        Issue issue = getIssue(projectUUID, issueUUID);
         issueRepository.delete(issue);
     }
 
+    private Issue getIssue(UUID projectUUID, UUID issueUUID) {
+        return issueRepository.findByProjectIdAndId(projectUUID, issueUUID).orElseThrow(
+                () -> new BusinessException("Issue not found", ErrorCode.NOT_FOUND)
+        );
+    }
 
-    private IssueResponse mapToIssueResponse(Issue issue){
+    @Transactional
+    public IssueResponse assignUser(String projectId, String issueId, @Valid AssignIssueRequest request) {
+        UUID projectUUID = parseProjectId(projectId);
+        UUID issueUUID = parseIssueId(issueId);
+        UUID assigneeId = request.getUserId();
+        Project project = getProjectById(projectUUID);
+        UUID workspaceUUID = project.getWorkspace().getId();
+        WorkspaceMember member = getCurrentProjectMember(project);
+        WorkspaceMember assigneeMembership = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceUUID, assigneeId)
+                .orElseThrow(() -> new BusinessException(
+                        "User is not a member of this workspace",
+                        ErrorCode.NOT_FOUND
+                ));
+        if (!canAssignUser(member.getRole())) {
+            throw new BusinessException("Access Denied: You can not assign user", ErrorCode.FORBIDDEN);
+        }
+        if (!canManageAssignments(assigneeMembership.getRole())) {
+            throw new BusinessException("Access Denied: Assignee do not have enough privileges", ErrorCode.FORBIDDEN);
+        }
+
+        Issue issue = getIssue(projectUUID, issueUUID);
+        if (issue.getAssignee() != null && issue.getAssignee().getId().equals(assigneeId)) {
+            throw new BusinessException(
+                    "Issue already assigned to this user",
+                    ErrorCode.BAD_REQUEST
+            );
+        }
+        issue.setAssignee(assigneeMembership.getUser());
+        return mapToIssueResponse(issue);
+    }
+
+
+    private IssueResponse mapToIssueResponse(Issue issue) {
+        User assignee = issue.getAssignee();
         return IssueResponse.builder()
                 .id(issue.getId())
                 .title(issue.getTitle())
@@ -128,28 +157,47 @@ public class IssueService {
                 .status(issue.getStatus())
                 .projectId(issue.getProject().getId())
                 .projectName(issue.getProject().getName())
+                .assigneeId(
+                        assignee != null ? assignee.getId() : null
+                )
+                .assigneeEmail(
+                        assignee != null ? assignee.getEmail() : null
+                )
                 .build();
     }
-    private UUID parseProjectId(String id){
-        return Utils.parseUuid(id,"Invalid Project Id");
+
+    private UUID parseProjectId(String id) {
+        return Utils.parseUuid(id, "Invalid Project Id");
     }
-    private UUID parseIssueId(String id){
-        return Utils.parseUuid(id,"Invalid Issue Id");
+
+    private UUID parseIssueId(String id) {
+        return Utils.parseUuid(id, "Invalid Issue Id");
     }
-    private Project getProjectById(UUID projectUUID){
+
+    private Project getProjectById(UUID projectUUID) {
         return projectRepository.findById(projectUUID).orElseThrow(
-                ()-> new BusinessException("Project not found", ErrorCode.NOT_FOUND)
+                () -> new BusinessException("Project not found", ErrorCode.NOT_FOUND)
         );
     }
 
-    private boolean canCreateIssue(WorkspaceRole role){
+    private boolean canCreateIssue(WorkspaceRole role) {
         return role != WorkspaceRole.VIEWER;
     }
 
-    private boolean canUpdateIssue(WorkspaceRole role) {return role != WorkspaceRole.VIEWER;}
+    private boolean canUpdateIssue(WorkspaceRole role) {
+        return role != WorkspaceRole.VIEWER;
+    }
 
-    private boolean canDeleteIssue(WorkspaceRole role){
-        return role==WorkspaceRole.OWNER || role == WorkspaceRole.MAINTAINER;
+    private boolean canDeleteIssue(WorkspaceRole role) {
+        return role == WorkspaceRole.OWNER || role == WorkspaceRole.MAINTAINER;
+    }
+
+    private boolean canAssignUser(WorkspaceRole role) {
+        return role != WorkspaceRole.VIEWER;
+    }
+
+    private boolean canManageAssignments(WorkspaceRole role) {
+        return role != WorkspaceRole.VIEWER;
     }
 
     private WorkspaceMember getCurrentProjectMember(UUID projectId) {
@@ -158,11 +206,11 @@ public class IssueService {
         );
     }
 
-    private WorkspaceMember getCurrentProjectMember(Project project){
+    private WorkspaceMember getCurrentProjectMember(Project project) {
         UUID currUser = currentUserService.getCurrentUserId();
         Workspace workspace = project.getWorkspace();
-        return workspaceMemberRepository.findByWorkspaceIdAndUserId(workspace.getId(),currUser).orElseThrow(
-                ()->new BusinessException("Access Denied: You do not have access to this workspace",ErrorCode.FORBIDDEN)
+        return workspaceMemberRepository.findByWorkspaceIdAndUserId(workspace.getId(), currUser).orElseThrow(
+                () -> new BusinessException("Access Denied: You do not have access to this workspace", ErrorCode.FORBIDDEN)
         );
     }
 }

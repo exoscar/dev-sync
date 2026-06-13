@@ -3,6 +3,7 @@ package org.devsync.spring.issue.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.common.entity.BaseEntity;
 import org.devsync.spring.project.entity.Project;
 
@@ -28,6 +29,10 @@ public class Issue extends BaseEntity {
     @ManyToOne(optional = false)
     @JoinColumn(name = "project_id")
     private Project project;
+
+    @ManyToOne
+    @JoinColumn(name = "assignee_id")
+    private User assignee;
 
 
 }

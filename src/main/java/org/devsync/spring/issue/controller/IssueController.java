@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.devsync.spring.common.constants.AppConstants;
 import org.devsync.spring.common.response.ApiResponse;
 import org.devsync.spring.common.util.ApiResponseUtil;
-import org.devsync.spring.issue.dto.CreateIssueRequest;
-import org.devsync.spring.issue.dto.IssueResponse;
-import org.devsync.spring.issue.dto.UpdateIssueRequest;
-import org.devsync.spring.issue.dto.UpdateStatusRequest;
+import org.devsync.spring.issue.dto.*;
 import org.devsync.spring.issue.service.IssueService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -54,6 +51,12 @@ public class IssueController {
                                                    @Valid @RequestBody UpdateStatusRequest request){
         IssueResponse response = issueService.updateStatus(projectId,issueId,request);
         return ApiResponseUtil.success(response,"Status updated successful");
+    }
+
+    @PatchMapping("/{issueId}/assignee")
+    public ApiResponse<IssueResponse> assignUser(@PathVariable String projectId,@PathVariable String issueId,@Valid @RequestBody AssignIssueRequest request){
+        IssueResponse response = issueService.assignUser(projectId,issueId,request);
+        return ApiResponseUtil.success(response,"User assigned to Issue");
     }
 
     @DeleteMapping("{issueId}")
