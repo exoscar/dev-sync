@@ -2,6 +2,8 @@ package org.devsync.spring.issue.service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.devsync.spring.activity.entity.ActivityType;
+import org.devsync.spring.activity.service.IssueActivityService;
 import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
@@ -33,6 +35,7 @@ public class IssueService {
     private final ProjectRepository projectRepository;
     private final CurrentUserService currentUserService;
     private final WorkspaceMemberRepository workspaceMemberRepository;
+    private final IssueActivityService issueActivityService;
 
     @Transactional
     public IssueResponse createIssue(String projectId, @Valid CreateIssueRequest request) {
@@ -48,6 +51,12 @@ public class IssueService {
         issue.setStatus(IssueStatus.TODO);
         issue.setProject(project);
         issueRepository.save(issue);
+
+        issueActivityService.recordActivity(issue,
+                member.getUser(),
+                ActivityType.ISSUE_CREATED,
+                "Issue Created: "+issue.getTitle());
+
         return mapToIssueResponse(issue);
     }
 
@@ -56,7 +65,6 @@ public class IssueService {
         getCurrentProjectMember(projectUUID);
         PageRequest pageable = PageRequest.of(page, size, Sort.by("id"));
         Page<Issue> issues = issueRepository.findByProjectId(projectUUID, pageable);
-
         return issues.map(this::mapToIssueResponse);
     }
 
@@ -71,6 +79,10 @@ public class IssueService {
         Issue issue = getIssue(projectUUID, issueUUID);
         issue.setTitle(request.getTitle().trim());
         issue.setDescription(request.getDescription().trim());
+        issueActivityService.recordActivity(issue,
+                member.getUser(),
+                ActivityType.ISSUE_UPDATED,
+                "Issue updated: "+issue.getTitle());
         return mapToIssueResponse(issue);
     }
 
@@ -94,7 +106,13 @@ public class IssueService {
         if (issue.getStatus() == request.getStatus()) {
             throw new BusinessException("Status can not be same", ErrorCode.BAD_REQUEST);
         }
+        IssueStatus oldStatus = issue.getStatus();
         issue.setStatus(request.getStatus());
+        issueActivityService.recordActivity(issue,
+                member.getUser(),
+                ActivityType.ISSUE_STATUS_CHANGED,
+                "Changed status from " + oldStatus+
+                        " to " + request.getStatus());
         return mapToIssueResponse(issue);
     }
 
@@ -107,6 +125,10 @@ public class IssueService {
             throw new BusinessException("Access Denied: You can not delete issue", ErrorCode.FORBIDDEN);
         }
         Issue issue = getIssue(projectUUID, issueUUID);
+        issueActivityService.recordActivity(issue,
+                member.getUser(),
+                ActivityType.ISSUE_DELETED,
+                "Issue Deleted: "+issue.getTitle());
         issueRepository.delete(issue);
     }
 
@@ -144,6 +166,12 @@ public class IssueService {
             );
         }
         issue.setAssignee(assigneeMembership.getUser());
+
+        issueActivityService.recordActivity(issue,
+                member.getUser(),
+                ActivityType.ISSUE_ASSIGNED,
+                "Issue Assigned to: "+assigneeMembership.getUser().getEmail());
+
         return mapToIssueResponse(issue);
     }
 

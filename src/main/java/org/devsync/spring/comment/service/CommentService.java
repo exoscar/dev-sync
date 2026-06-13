@@ -2,6 +2,8 @@ package org.devsync.spring.comment.service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.devsync.spring.activity.entity.ActivityType;
+import org.devsync.spring.activity.service.IssueActivityService;
 import org.devsync.spring.comment.dto.CommentResponse;
 import org.devsync.spring.comment.dto.CreateCommentRequest;
 import org.devsync.spring.comment.dto.UpdateCommentRequest;
@@ -35,6 +37,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
     private final IssueRepository issueRepository;
+    private final IssueActivityService issueActivityService;
 
     @Transactional
     public CommentResponse createComment(String issueId, @Valid CreateCommentRequest request) {
@@ -46,6 +49,10 @@ public class CommentService {
         comment.setAuthor(member.getUser());
         comment.setIssue(issue);
         comment = commentRepository.save(comment);
+        issueActivityService.recordActivity(issue,
+                member.getUser(),
+                ActivityType.COMMENT_ADDED,
+                "Added a Comment");
         return mapToCommentResponse(comment);
     }
 
@@ -78,6 +85,10 @@ public class CommentService {
             );
         }
         comment.setContent(content);
+        issueActivityService.recordActivity(comment.getIssue(),
+                member.getUser(),
+                ActivityType.COMMENT_UPDATED,
+                "Updated a Comment");
         return mapToCommentResponse(comment);
     }
 
@@ -91,6 +102,10 @@ public class CommentService {
         if(!canManageComment(member,comment)){
             throw new BusinessException("Access Denied: You can not delete comments",ErrorCode.FORBIDDEN);
         }
+        issueActivityService.recordActivity(comment.getIssue(),
+                member.getUser(),
+                ActivityType.COMMENT_DELETED,
+                "Deleted a Comment");
         commentRepository.delete(comment);
     }
 
