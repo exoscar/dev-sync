@@ -52,9 +52,8 @@ public class IssueService {
     }
 
     public Page<IssueResponse> getAllIssues(String projectId, int page, int size,IssueFilterRequest filterRequest) {
-        UUID projectUUID = validationService.parseProjectId(projectId);
-        issueAccessService.loadProjectContext(projectId);
-        Specification<Issue> spec = IssueSpecification.hasProject(projectUUID);
+        Project project = issueAccessService.loadProjectContext(projectId).project();
+        Specification<Issue> spec = IssueSpecification.hasProject(project.getId());
         if(filterRequest.getStatus() != null){
             spec = spec.and(IssueSpecification.hasStatus(filterRequest.getStatus()));
         }
@@ -147,8 +146,7 @@ public class IssueService {
     }
 
     public ProjectStatsResponse getProjectStats(String projectId) {
-        UUID projectUUID = validationService.parseProjectId(projectId);
-        issueAccessService.loadProjectContext(projectId);
+        UUID projectUUID =  issueAccessService.loadProjectContext(projectId).project().getId();
         return ProjectStatsResponse.builder()
                 .totalIssues(issueRepository.countByProjectId(projectUUID))
                 .todoIssues(issueRepository.countByProjectIdAndStatus(projectUUID, IssueStatus.TODO))
