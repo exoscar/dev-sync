@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
+import org.devsync.spring.common.security.CurrentUserService;
 import org.devsync.spring.issue.context.IssueContext;
 import org.devsync.spring.issue.dto.*;
 import org.devsync.spring.issue.entity.Issue;
@@ -28,7 +29,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class IssueService {
-
+    private final CurrentUserService currentUserService;
     private final IssueRepository issueRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
     private final IssueMapper mapper;
@@ -45,32 +46,37 @@ public class IssueService {
         Project project = context.project();
         WorkspaceMember member = context.member();
         issueAuthorizationService.requireContributor(member);
-        Issue issue = issueFactory.create(project,request);
+        Issue issue = issueFactory.create(project, request);
         issueRepository.save(issue);
-        activityService.issueCreated(issue,member.getUser());
+        activityService.issueCreated(issue, member.getUser());
         return mapper.ToResponse(issue);
     }
 
-    public Page<IssueResponse> getAllIssues(String projectId, int page, int size,IssueFilterRequest filterRequest) {
+    public Page<IssueResponse> getAllIssues(String projectId, int page, int size, IssueFilterRequest filterRequest) {
         Project project = issueAccessService.loadProjectContext(projectId).project();
         Specification<Issue> spec = IssueSpecification.hasProject(project.getId());
-        if(filterRequest.getStatus() != null){
+        if (filterRequest.getStatus() != null) {
             spec = spec.and(IssueSpecification.hasStatus(filterRequest.getStatus()));
         }
-        if(filterRequest.getPriority() != null){
+        if (filterRequest.getPriority() != null) {
             spec = spec.and(IssueSpecification.hasPriority(filterRequest.getPriority()));
         }
-        if(filterRequest.getAssigneeId()!=null){
+        if (filterRequest.getAssigneeId() != null) {
             spec = spec.and(IssueSpecification.hasAssignee(filterRequest.getAssigneeId()));
         }
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Issue> issues =issueRepository.findAll(spec,pageable);
+        Page<Issue> issues = issueRepository.findAll(spec, pageable);
         return issues.map(mapper::ToResponse);
+    }
+
+    public Page<IssueResponse> getMyAssignedIssues(String projectId, IssueStatus status, IssuePriority priority, int page, int size) {
+        IssueFilterRequest filterRequest = IssueFilterRequest.builder().status(status).priority(priority).assigneeId(currentUserService.getCurrentUserId()).build();
+        return getAllIssues(projectId, page, size, filterRequest);
     }
 
     @Transactional
     public IssueResponse updateIssue(String projectId, String issueId, UpdateIssueRequest request) {
-        IssueContext context =issueAccessService.loadIssueContext(projectId,issueId);
+        IssueContext context = issueAccessService.loadIssueContext(projectId, issueId);
         WorkspaceMember member = context.member();
         issueAuthorizationService.requireContributor(member);
         Issue issue = context.issue();
@@ -81,18 +87,18 @@ public class IssueService {
     }
 
     public IssueResponse getIssueById(String projectId, String issueId) {
-        IssueContext context =issueAccessService.loadIssueContext(projectId,issueId);
+        IssueContext context = issueAccessService.loadIssueContext(projectId, issueId);
         Issue issue = context.issue();
         return mapper.ToResponse(issue);
     }
 
     @Transactional
     public IssueResponse updateStatus(String projectId, String issueId, @Valid UpdateStatusRequest request) {
-        IssueContext context =issueAccessService.loadIssueContext(projectId,issueId);
+        IssueContext context = issueAccessService.loadIssueContext(projectId, issueId);
         WorkspaceMember member = context.member();
         issueAuthorizationService.requireContributor(member);
         Issue issue = context.issue();
-        validationService.validateStatusChange(issue,request.getStatus());
+        validationService.validateStatusChange(issue, request.getStatus());
         IssueStatus oldStatus = issue.getStatus();
         issue.setStatus(request.getStatus());
         activityService.issueStatusChanged(issue, member.getUser(), oldStatus);
@@ -101,17 +107,17 @@ public class IssueService {
 
     @Transactional
     public void deleteIssue(String projectId, String issueId) {
-        IssueContext context =issueAccessService.loadIssueContext(projectId,issueId);
+        IssueContext context = issueAccessService.loadIssueContext(projectId, issueId);
         WorkspaceMember member = context.member();
         issueAuthorizationService.requireManager(member);
         Issue issue = context.issue();
-        activityService.issueDeleted(issue,member.getUser());
+        activityService.issueDeleted(issue, member.getUser());
         issueRepository.delete(issue);
     }
 
     @Transactional
     public IssueResponse assignUser(String projectId, String issueId, @Valid AssignIssueRequest request) {
-        IssueContext context =issueAccessService.loadIssueContext(projectId,issueId);
+        IssueContext context = issueAccessService.loadIssueContext(projectId, issueId);
         Project project = context.project();
         WorkspaceMember member = context.member();
         UUID workspaceUUID = project.getWorkspace().getId();
@@ -126,7 +132,7 @@ public class IssueService {
         issueAuthorizationService.requireContributor(member);
         issueAuthorizationService.requireContributor(assigneeMembership);
         Issue issue = context.issue();
-        validationService.validateAssignee(issue,assigneeId);
+        validationService.validateAssignee(issue, assigneeId);
         issue.setAssignee(assigneeMembership.getUser());
         activityService.issueAssigned(issue, member.getUser(), assigneeMembership.getUser());
         return mapper.ToResponse(issue);
@@ -134,29 +140,16 @@ public class IssueService {
 
     @Transactional
     public IssueResponse changePriority(String projectId, String issueId, ChangePriorityRequest request) {
-        IssueContext context =issueAccessService.loadIssueContext(projectId,issueId);
+        IssueContext context = issueAccessService.loadIssueContext(projectId, issueId);
         WorkspaceMember member = context.member();
         issueAuthorizationService.requireContributor(member);
         Issue issue = context.issue();
         IssuePriority oldPriority = issue.getPriority();
-        validationService.validatePriorityChange(issue,request.getIssuePriority());
+        validationService.validatePriorityChange(issue, request.getIssuePriority());
         issue.setPriority(request.getIssuePriority());
         activityService.issuePriorityChanged(issue, member.getUser(), oldPriority);
         return mapper.ToResponse(issue);
     }
 
-    public ProjectStatsResponse getProjectStats(String projectId) {
-        UUID projectUUID =  issueAccessService.loadProjectContext(projectId).project().getId();
-        return ProjectStatsResponse.builder()
-                .totalIssues(issueRepository.countByProjectId(projectUUID))
-                .todoIssues(issueRepository.countByProjectIdAndStatus(projectUUID, IssueStatus.TODO))
-                .inProgressIssues(issueRepository.countByProjectIdAndStatus(projectUUID,IssueStatus.IN_PROGRESS))
-                .doneIssues(issueRepository.countByProjectIdAndStatus(projectUUID,IssueStatus.DONE))
-                .lowPriority(issueRepository.countByProjectIdAndPriority(projectUUID,IssuePriority.LOW))
-                .mediumPriority(issueRepository.countByProjectIdAndPriority(projectUUID,IssuePriority.MEDIUM))
-                .highPriority(issueRepository.countByProjectIdAndPriority(projectUUID,IssuePriority.HIGH))
-                .criticalPriority(issueRepository.countByProjectIdAndPriority(projectUUID,IssuePriority.CRITICAL))
-                .assignedIssues(issueRepository.countByProjectIdAndAssigneeIsNotNull(projectUUID))
-                .unassignedIssues(issueRepository.countByProjectIdAndAssigneeIsNull(projectUUID)).build();
-    }
+
 }

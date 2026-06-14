@@ -14,53 +14,53 @@ import org.springframework.stereotype.Service;
 public class IssueActivityUtilService {
     private final IssueActivityService activityService;
 
-    public void issueCreated(Issue issue, User actor){
+    public void issueCreated(Issue issue, User actor) {
         activityService.recordActivity(
-                issue,actor,
+                issue, actor,
                 ActivityType.ISSUE_CREATED,
-                "Issue Created: "+issue.getTitle()
+                "Issue Created: " + issue.getTitle()
         );
     }
 
-    public void issueUpdated(Issue issue, User actor){
+    public void issueUpdated(Issue issue, User actor) {
         activityService.recordActivity(issue,
                 actor,
                 ActivityType.ISSUE_UPDATED,
-                "Issue updated: "+issue.getTitle()
+                "Issue updated: " + issue.getTitle()
         );
     }
 
-    public void issueStatusChanged(Issue issue, User actor, IssueStatus oldStatus){
+    public void issueStatusChanged(Issue issue, User actor, IssueStatus oldStatus) {
         activityService.recordActivity(
                 issue,
                 actor,
                 ActivityType.ISSUE_STATUS_CHANGED,
-                "Changed status from " + oldStatus+
+                "Changed status from " + oldStatus +
                         " to " + issue.getStatus()
         );
     }
 
-    public void issueDeleted(Issue issue,User actor){
+    public void issueDeleted(Issue issue, User actor) {
         activityService.recordActivity(issue,
                 actor,
                 ActivityType.ISSUE_DELETED,
-                "Issue Deleted: "+issue.getTitle()
+                "Issue Deleted: " + issue.getTitle()
         );
     }
 
-    public void issueAssigned(Issue issue,User actor,User target){
+    public void issueAssigned(Issue issue, User actor, User target) {
         activityService.recordActivity(issue,
                 actor,
                 ActivityType.ISSUE_ASSIGNED,
-                "Issue Assigned to: "+target.getEmail()
+                "Issue Assigned to: " + target.getEmail()
         );
     }
 
-    public void issuePriorityChanged(Issue issue, User actor, IssuePriority oldPriority){
+    public void issuePriorityChanged(Issue issue, User actor, IssuePriority oldPriority) {
         activityService.recordActivity(issue,
                 actor,
                 ActivityType.ISSUE_PRIORITY_CHANGED,
-                "Priority changed from "+ oldPriority +" to "+issue.getPriority()
+                "Priority changed from " + oldPriority + " to " + issue.getPriority()
         );
     }
 

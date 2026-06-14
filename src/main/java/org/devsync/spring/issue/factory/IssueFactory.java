@@ -11,7 +11,7 @@ public class IssueFactory {
     public Issue create(
             Project project,
             CreateIssueRequest request
-    ){
+    ) {
         Issue issue = new Issue();
         issue.setTitle(request.getTitle().trim());
         issue.setDescription(request.getDescription().trim());

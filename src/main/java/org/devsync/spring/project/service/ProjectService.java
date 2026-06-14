@@ -40,13 +40,13 @@ public class ProjectService {
         );
 
 
-        WorkspaceMember member = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceId,currUser)
-                .orElseThrow(()-> new BusinessException("Access Denied: You do not have access to workspace",ErrorCode.FORBIDDEN));
-        if(!canManageProject(member.getRole())){
-            throw new BusinessException("Access Denied: You do not have access to create project",ErrorCode.FORBIDDEN);
+        WorkspaceMember member = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceId, currUser)
+                .orElseThrow(() -> new BusinessException("Access Denied: You do not have access to workspace", ErrorCode.FORBIDDEN));
+        if (!canManageProject(member.getRole())) {
+            throw new BusinessException("Access Denied: You do not have access to create project", ErrorCode.FORBIDDEN);
         }
-        if(projectRepository.existsByWorkspaceIdAndNameIgnoreCase(workspaceId,request.getName())){
-            throw new BusinessException("Project already exists in the current workspace",ErrorCode.PROJECT_ALREADY_EXISTS);
+        if (projectRepository.existsByWorkspaceIdAndNameIgnoreCase(workspaceId, request.getName())) {
+            throw new BusinessException("Project already exists in the current workspace", ErrorCode.PROJECT_ALREADY_EXISTS);
         }
 
         Project project = new Project();
@@ -63,11 +63,11 @@ public class ProjectService {
     public List<ProjectResponse> getAllProjects(String id) {
         UUID workspaceId = parseWorkspaceId(id);
         UUID currUser = currentUserService.getCurrentUserId();
-        if(!workspaceRepository.existsById(workspaceId)){
-            throw new BusinessException("Workspace not found",ErrorCode.NOT_FOUND);
+        if (!workspaceRepository.existsById(workspaceId)) {
+            throw new BusinessException("Workspace not found", ErrorCode.NOT_FOUND);
         }
-        if(!workspaceMemberRepository.existsByWorkspaceIdAndUserId(workspaceId,currUser)){
-            throw new BusinessException("Access Denied: You do not have access to workspace",ErrorCode.FORBIDDEN);
+        if (!workspaceMemberRepository.existsByWorkspaceIdAndUserId(workspaceId, currUser)) {
+            throw new BusinessException("Access Denied: You do not have access to workspace", ErrorCode.FORBIDDEN);
         }
         List<Project> projects = projectRepository.findByWorkspaceId(workspaceId);
         return projects.stream().map(this::maptoProjectResponse).toList();
@@ -77,14 +77,14 @@ public class ProjectService {
         UUID workspaceUUID = parseWorkspaceId(workspaceId);
         UUID projectId = parseProjectId(id);
         UUID currUser = currentUserService.getCurrentUserId();
-        if(!workspaceRepository.existsById(workspaceUUID)){
-            throw new BusinessException("Workspace not found",ErrorCode.NOT_FOUND);
+        if (!workspaceRepository.existsById(workspaceUUID)) {
+            throw new BusinessException("Workspace not found", ErrorCode.NOT_FOUND);
         }
-        if(!workspaceMemberRepository.existsByWorkspaceIdAndUserId(workspaceUUID,currUser)){
-            throw new BusinessException("Access Denied: You do not have access to workspace",ErrorCode.FORBIDDEN);
+        if (!workspaceMemberRepository.existsByWorkspaceIdAndUserId(workspaceUUID, currUser)) {
+            throw new BusinessException("Access Denied: You do not have access to workspace", ErrorCode.FORBIDDEN);
         }
-        Project project = projectRepository.findByWorkspaceIdAndId(workspaceUUID,projectId).orElseThrow(
-                ()-> new BusinessException("Project not found",ErrorCode.NOT_FOUND)
+        Project project = projectRepository.findByWorkspaceIdAndId(workspaceUUID, projectId).orElseThrow(
+                () -> new BusinessException("Project not found", ErrorCode.NOT_FOUND)
         );
         return maptoProjectResponse(project);
     }
@@ -94,17 +94,17 @@ public class ProjectService {
         UUID workspaceUUID = parseWorkspaceId(workspaceId);
         UUID projectId = parseProjectId(id);
         UUID currUser = currentUserService.getCurrentUserId();
-        if(!workspaceRepository.existsById(workspaceUUID)){
-            throw new BusinessException("Workspace not found",ErrorCode.NOT_FOUND);
+        if (!workspaceRepository.existsById(workspaceUUID)) {
+            throw new BusinessException("Workspace not found", ErrorCode.NOT_FOUND);
         }
-        WorkspaceMember member = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceUUID,currUser)
-                .orElseThrow(()-> new BusinessException("Access Denied: You do not have access to workspace",ErrorCode.FORBIDDEN));
+        WorkspaceMember member = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceUUID, currUser)
+                .orElseThrow(() -> new BusinessException("Access Denied: You do not have access to workspace", ErrorCode.FORBIDDEN));
 
-        Project project = projectRepository.findByWorkspaceIdAndId(workspaceUUID,projectId).orElseThrow(
-                ()-> new BusinessException("Project not found",ErrorCode.NOT_FOUND)
+        Project project = projectRepository.findByWorkspaceIdAndId(workspaceUUID, projectId).orElseThrow(
+                () -> new BusinessException("Project not found", ErrorCode.NOT_FOUND)
         );
-        if(!canManageProject(member.getRole())){
-            throw new BusinessException("Access Denied: You do not have access to update project",ErrorCode.FORBIDDEN);
+        if (!canManageProject(member.getRole())) {
+            throw new BusinessException("Access Denied: You do not have access to update project", ErrorCode.FORBIDDEN);
         }
         project.setName(request.getName());
         project.setDescription(request.getDescription());
@@ -118,21 +118,20 @@ public class ProjectService {
         UUID workspaceUUID = parseWorkspaceId(workspaceId);
         UUID projectId = parseProjectId(id);
         UUID currUser = currentUserService.getCurrentUserId();
-        if(!workspaceRepository.existsById(workspaceUUID)){
-            throw new BusinessException("Workspace not found",ErrorCode.NOT_FOUND);
+        if (!workspaceRepository.existsById(workspaceUUID)) {
+            throw new BusinessException("Workspace not found", ErrorCode.NOT_FOUND);
         }
-        WorkspaceMember member = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceUUID,currUser)
-                .orElseThrow(()-> new BusinessException("Access Denied: You do not have access to workspace",ErrorCode.FORBIDDEN));
+        WorkspaceMember member = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceUUID, currUser)
+                .orElseThrow(() -> new BusinessException("Access Denied: You do not have access to workspace", ErrorCode.FORBIDDEN));
 
-        Project project = projectRepository.findByWorkspaceIdAndId(workspaceUUID,projectId).orElseThrow(
-                ()-> new BusinessException("Project not found",ErrorCode.NOT_FOUND)
+        Project project = projectRepository.findByWorkspaceIdAndId(workspaceUUID, projectId).orElseThrow(
+                () -> new BusinessException("Project not found", ErrorCode.NOT_FOUND)
         );
-        if(!canManageProject(member.getRole())){
-            throw new BusinessException("Access Denied: You do not have access to delete project",ErrorCode.FORBIDDEN);
+        if (!canManageProject(member.getRole())) {
+            throw new BusinessException("Access Denied: You do not have access to delete project", ErrorCode.FORBIDDEN);
         }
         projectRepository.delete(project);
     }
-
 
 
     private ProjectResponse maptoProjectResponse(Project project) {
@@ -146,18 +145,18 @@ public class ProjectService {
     }
 
 
-    private boolean canManageProject(WorkspaceRole role){
-       return role == WorkspaceRole.OWNER
-               || role == WorkspaceRole.MAINTAINER;
-    }
-    private UUID parseWorkspaceId(String id){
-        return  Utils.parseUuid(id,"Invalid Workspace Id");
+    private boolean canManageProject(WorkspaceRole role) {
+        return role == WorkspaceRole.OWNER
+                || role == WorkspaceRole.MAINTAINER;
     }
 
-    private UUID parseProjectId(String id){
-        return Utils.parseUuid(id,"Invalid Project Id");
+    private UUID parseWorkspaceId(String id) {
+        return Utils.parseUuid(id, "Invalid Workspace Id");
     }
 
+    private UUID parseProjectId(String id) {
+        return Utils.parseUuid(id, "Invalid Project Id");
+    }
 
 
 }

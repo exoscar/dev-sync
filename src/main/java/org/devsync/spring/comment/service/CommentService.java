@@ -15,7 +15,10 @@ import org.devsync.spring.common.security.CurrentUserService;
 import org.devsync.spring.common.util.Utils;
 import org.devsync.spring.issue.entity.Issue;
 import org.devsync.spring.issue.repository.IssueRepository;
+import org.devsync.spring.issue.service.IssueValidationService;
 import org.devsync.spring.project.entity.Project;
+import org.devsync.spring.project.service.ProjectAccessService;
+import org.devsync.spring.project.service.ProjectValidationService;
 import org.devsync.spring.workspace.entity.Workspace;
 import org.devsync.spring.workspace.entity.WorkspaceMember;
 import org.devsync.spring.workspace.entity.WorkspaceRole;
@@ -38,12 +41,15 @@ public class CommentService {
     private final WorkspaceMemberRepository workspaceMemberRepository;
     private final IssueRepository issueRepository;
     private final IssueActivityService issueActivityService;
+    private final ProjectAccessService projectAccessService;
+    private final CommentAuthorizationService authorizationService;
+    private final IssueValidationService issueValidationService;
 
     @Transactional
     public CommentResponse createComment(String issueId, @Valid CreateCommentRequest request) {
-        UUID issueUUID = parseIssueId(issueId);
+        UUID issueUUID = issueValidationService.parseIssueId(issueId);
         Issue issue = getIssue(issueUUID);
-        WorkspaceMember member = getCurrentProjectMember(issue.getProject());
+        WorkspaceMember member = projectAccessService.getCurrentProjectMember(issue.getProject());
         Comment comment = new Comment();
         comment.setContent(request.getContent().trim());
         comment.setAuthor(member.getUser());
@@ -58,9 +64,9 @@ public class CommentService {
 
 
     public Page<CommentResponse> getComments(String issueId,int page,int size) {
-        UUID issueUUID = parseIssueId(issueId);
+        UUID issueUUID =  issueValidationService.parseIssueId(issueId);
         Issue issue = getIssue(issueUUID);
-        getCurrentProjectMember(issue.getProject());
+        projectAccessService.getCurrentProjectMember(issue.getProject());
         Pageable pageable = PageRequest.of(page,size, Sort.by(Sort.Direction.ASC, "createdAt"));
         Page<Comment> comments = commentRepository.findByIssueId(issueUUID,pageable);
         return comments.map(this::mapToCommentResponse);
@@ -71,10 +77,8 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentUUID).orElseThrow(()->
                 new BusinessException("Comment not found",ErrorCode.NOT_FOUND));
         Project project = comment.getIssue().getProject();
-        WorkspaceMember member = getCurrentProjectMember(project);
-        if(!canManageComment(member,comment)){
-            throw new BusinessException("Access Denied: You cannot edit this comment",ErrorCode.FORBIDDEN);
-        }
+        WorkspaceMember member = projectAccessService.getCurrentProjectMember(project);
+        authorizationService.requireCommentManagePermission(member,comment);
         String content =
                 updateCommentRequest.getContent().trim();
 
@@ -98,10 +102,8 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentUUID).orElseThrow(()->
                 new BusinessException("Comment not found",ErrorCode.NOT_FOUND));
         Project project = comment.getIssue().getProject();
-        WorkspaceMember member = getCurrentProjectMember(project);
-        if(!canManageComment(member,comment)){
-            throw new BusinessException("Access Denied: You can not delete comments",ErrorCode.FORBIDDEN);
-        }
+        WorkspaceMember member = projectAccessService.getCurrentProjectMember(project);
+       authorizationService.requireCommentManagePermission(member,comment);
         issueActivityService.recordActivity(comment.getIssue(),
                 member.getUser(),
                 ActivityType.COMMENT_DELETED,
@@ -123,9 +125,6 @@ public class CommentService {
 
 
 
-    private UUID parseIssueId(String id) {
-        return Utils.parseUuid(id, "Invalid Issue Id");
-    }
     private UUID parseCommentId(String id) {
         return Utils.parseUuid(id, "Invalid Comment Id");
     }
@@ -136,21 +135,7 @@ public class CommentService {
         );
     }
 
-    private boolean canManageComment(WorkspaceMember member, Comment comment){
-        return member.getRole() == WorkspaceRole.OWNER
-                || member.getRole() == WorkspaceRole.MAINTAINER
-                || member.getUser().getId().equals(
-                comment.getAuthor().getId()
-        );
-    }
 
-    private WorkspaceMember getCurrentProjectMember(Project project) {
-        UUID currUser = currentUserService.getCurrentUserId();
-        Workspace workspace = project.getWorkspace();
-        return workspaceMemberRepository.findByWorkspaceIdAndUserId(workspace.getId(), currUser).orElseThrow(
-                () -> new BusinessException("Access Denied: You do not have access to this workspace", ErrorCode.FORBIDDEN)
-        );
-    }
 
 
 }

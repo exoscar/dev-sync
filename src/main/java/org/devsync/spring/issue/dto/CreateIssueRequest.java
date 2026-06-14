@@ -23,5 +23,5 @@ public class CreateIssueRequest {
     private String description;
 
     @JsonSetter(nulls = Nulls.SKIP)
-    private IssuePriority priority= IssuePriority.MEDIUM;
+    private IssuePriority priority = IssuePriority.MEDIUM;
 }

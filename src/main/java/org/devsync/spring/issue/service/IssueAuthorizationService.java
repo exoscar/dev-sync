@@ -11,7 +11,7 @@ public class IssueAuthorizationService {
     public void requireContributor(
             WorkspaceMember member
     ) {
-        if(member.getRole() == WorkspaceRole.VIEWER){
+        if (member.getRole() == WorkspaceRole.VIEWER) {
             throw new BusinessException(
                     "Access Denied: You do not have enough privileges to perform this task",
                     ErrorCode.FORBIDDEN
@@ -21,8 +21,8 @@ public class IssueAuthorizationService {
 
     public void requireManager(
             WorkspaceMember member
-    ){
-        if(!(member.getRole() == WorkspaceRole.OWNER || member.getRole() == WorkspaceRole.MAINTAINER)){
+    ) {
+        if (!(member.getRole() == WorkspaceRole.OWNER || member.getRole() == WorkspaceRole.MAINTAINER)) {
             throw new BusinessException(
                     "Access Denied: You can not delete issue",
                     ErrorCode.FORBIDDEN
@@ -30,7 +30,6 @@ public class IssueAuthorizationService {
 
         }
     }
-
 
 
 }

@@ -8,7 +8,6 @@ import org.devsync.spring.auth.repository.UserRepository;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
 import org.devsync.spring.common.security.CurrentUserService;
-import org.devsync.spring.common.util.Utils;
 import org.devsync.spring.user.dto.UserResponse;
 import org.devsync.spring.workspace.dto.*;
 import org.devsync.spring.workspace.entity.Workspace;
@@ -34,6 +33,8 @@ public class WorkspaceService {
     private final CurrentUserService currentUserService;
     private final WorkspaceMemberRepository workspaceMemberRepository;
     private final UserRepository userRepository;
+    private final WorkspaceAccessService workspaceAccessService;
+    private final WorkspaceValidationService validationService;
 
     @Transactional
     public WorkspaceResponse createWorkspace(CreateWorkspaceRequest request) {
@@ -60,17 +61,7 @@ public class WorkspaceService {
     }
 
     public WorkspaceResponse getWorkspaceById(String id) {
-        UUID workspaceId = Utils.parseUuid(id, "Invalid Workspace Id");
-        UUID currentUser = currentUserService.getCurrentUserId();
-
-        Workspace workspace = workspaceRepository.findById(workspaceId).orElseThrow(
-                () -> new BusinessException("Workspace not found", ErrorCode.NOT_FOUND)
-        );
-
-        if (!workspaceMemberRepository.existsByWorkspaceIdAndUserId(workspaceId, currentUser)) {
-            throw new BusinessException("You do not have access to this workspace", ErrorCode.FORBIDDEN);
-        }
-
+        Workspace workspace =  workspaceAccessService.getWorkspaceWithMembershipCheck(id);
         return mapToWorkspace(workspace);
     }
 
@@ -90,25 +81,17 @@ public class WorkspaceService {
 
     @Transactional
     public MemberResponse inviteMember(String id, @Valid InviteMemberRequest request) {
-        UUID workspaceId = Utils.parseUuid(id, "Invalid Workspace Id");
-        UUID currUser = currentUserService.getCurrentUserId();
+        UUID workspaceId = validationService.parseWorkspaceId(id);
         if (request.getRole() == WorkspaceRole.OWNER) {
             throw new BusinessException("Owner role cannot be assigned", ErrorCode.BAD_REQUEST);
         }
-
-        Workspace workspace = workspaceRepository.findById(workspaceId).orElseThrow(
-                () -> new BusinessException("Workspace not found", ErrorCode.NOT_FOUND)
-        );
-        WorkspaceMember currMember = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceId, currUser)
-                .orElseThrow(() -> new BusinessException("You do not have access to this workspace", ErrorCode.FORBIDDEN));
-
+        Workspace workspace = workspaceAccessService.getWorkspaceById(workspaceId);
+        WorkspaceMember currMember = workspaceAccessService.getCurrentWorkspaceMember(workspaceId);
         if (!canManageMembers(currMember.getRole(), request.getRole())) {
             throw new BusinessException("You do not have access to invite new members", ErrorCode.FORBIDDEN);
         }
-
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
                 () -> new BusinessException("User not Found", ErrorCode.NOT_FOUND));
-
         if (workspaceMemberRepository.existsByWorkspaceIdAndUserId(workspaceId, user.getId())) {
             throw new BusinessException("Member already exists", ErrorCode.MEMBER_ALREADY_EXISTS);
         }
@@ -122,34 +105,24 @@ public class WorkspaceService {
 
 
     public List<WorkspaceMemberResponse> getWorkspaceMembers(String id) {
-        UUID workspaceId = Utils.parseUuid(id, "Invalid Workspace Id");
-        UUID currUser = currentUserService.getCurrentUserId();
-        if (!workspaceRepository.existsById(workspaceId)) {
-            throw new BusinessException("Workspace not found", ErrorCode.NOT_FOUND);
-        }
-        if (!workspaceMemberRepository.existsByWorkspaceIdAndUserId(workspaceId, currUser)) {
-            throw new BusinessException("You do not have access to this workspace", ErrorCode.FORBIDDEN);
-        }
-        List<WorkspaceMember> members = workspaceMemberRepository.findByWorkspaceId(workspaceId);
-
+       Workspace workspace = workspaceAccessService.getWorkspaceWithMembershipCheck(id);
+        List<WorkspaceMember> members = workspaceMemberRepository.findByWorkspaceId(workspace.getId());
         return members.stream().map(this::mapToWorkspaceMember).toList();
     }
 
+
+
     @Transactional
     public MemberResponse updateMemberRole(String id, @Valid UpdateRoleRequest request) {
-        UUID workspaceId = Utils.parseUuid(id, "Invalid Workspace Id");
+        UUID workspaceId = validationService.parseWorkspaceId(id);
         UUID currUser = currentUserService.getCurrentUserId();
 
-        if (!workspaceRepository.existsById(workspaceId)) {
-            throw new BusinessException("Workspace not found", ErrorCode.NOT_FOUND);
-        }
+        workspaceAccessService.getWorkspaceById(workspaceId);
         if (request.getRole() == WorkspaceRole.OWNER) {
             throw new BusinessException("Owner role cannot be assigned", ErrorCode.BAD_REQUEST);
         }
-        WorkspaceMember tarMember = workspaceMemberRepository.findByWorkspaceIdAndId(workspaceId, request.getId())
-                .orElseThrow(() -> new BusinessException("Member not found", ErrorCode.NOT_FOUND));
-        WorkspaceMember currMember = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceId, currUser)
-                .orElseThrow(() -> new BusinessException("You do not have access to this workspace", ErrorCode.FORBIDDEN));
+        WorkspaceMember tarMember = workspaceAccessService.getWorkspaceMember(workspaceId,request.getId());
+        WorkspaceMember currMember = workspaceAccessService.getCurrentWorkspaceMember(workspaceId);
         if (tarMember.getUser().getId().equals(currUser)) {
             throw new BusinessException("You cannot modify your own role", ErrorCode.FORBIDDEN);
         }
@@ -167,15 +140,11 @@ public class WorkspaceService {
 
     @Transactional
     public void deleteMember(String id, @Valid DeleteMemberRequest request) {
-        UUID workspaceId = Utils.parseUuid(id, "Invalid Workspace Id");
+        UUID workspaceId = validationService.parseWorkspaceId(id);
         UUID currUser = currentUserService.getCurrentUserId();
-        if (!workspaceRepository.existsById(workspaceId)) {
-            throw new BusinessException("Workspace not found", ErrorCode.NOT_FOUND);
-        }
-        WorkspaceMember tarMember = workspaceMemberRepository.findByWorkspaceIdAndId(workspaceId, request.getId())
-                .orElseThrow(() -> new BusinessException("Member not found", ErrorCode.NOT_FOUND));
-        WorkspaceMember currMember = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceId, currUser)
-                .orElseThrow(() -> new BusinessException("You do not have access to this workspace", ErrorCode.FORBIDDEN));
+        workspaceAccessService.getWorkspaceById(workspaceId);
+        WorkspaceMember tarMember = workspaceAccessService.getWorkspaceMember(workspaceId,request.getId());
+        WorkspaceMember currMember = workspaceAccessService.getCurrentWorkspaceMember(workspaceId);
         if (tarMember.getRole() == WorkspaceRole.OWNER) {
             throw new BusinessException(
                     "Workspace owner cannot be removed",

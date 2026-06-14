@@ -1,4 +1,4 @@
-package org.devsync.spring.issue.dto;
+package org.devsync.spring.dashboard.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

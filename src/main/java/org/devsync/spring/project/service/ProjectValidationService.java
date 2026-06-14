@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Service
 public class ProjectValidationService {
-    public UUID parseProjectId(String id){
-        return Utils.parseUuid(id,"Invalid Project Id");
+    public UUID parseProjectId(String id) {
+        return Utils.parseUuid(id, "Invalid Project Id");
     }
 }

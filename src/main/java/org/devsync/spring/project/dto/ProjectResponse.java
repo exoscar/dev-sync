@@ -2,7 +2,6 @@ package org.devsync.spring.project.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import org.devsync.spring.workspace.entity.Workspace;
 
 import java.util.UUID;
 

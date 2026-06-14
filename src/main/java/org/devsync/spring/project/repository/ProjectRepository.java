@@ -13,6 +13,9 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     List<Project> findByWorkspaceId(UUID workspaceId);
 
     Optional<Project> findByWorkspaceIdAndId(UUID workspaceId, UUID id);
+
     boolean existsByWorkspaceIdAndNameIgnoreCase(UUID workspaceId, String name);
+
+    long countByWorkspaceId(UUID workspaceId);
 
 }
