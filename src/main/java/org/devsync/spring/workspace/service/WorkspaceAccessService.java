@@ -11,6 +11,7 @@ import org.devsync.spring.workspace.repository.WorkspaceRepository;
 import org.hibernate.jdbc.Work;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -62,7 +63,12 @@ public class WorkspaceAccessService {
         return getWorkspaceMember(workspaceId,currentUser);
     }
 
-
-
-
+    public List<WorkspaceMember> getWorkspaceMembers(UUID workspaceId){
+        Workspace workspace = getWorkspaceWithMembershipCheck(workspaceId);
+        return workspaceMemberRepository.findByWorkspaceId(workspace.getId());
+    }
+    public List<WorkspaceMember> getWorkspaceMembers(String workspaceId){
+        Workspace workspace = getWorkspaceWithMembershipCheck(workspaceId);
+        return workspaceMemberRepository.findByWorkspaceId(workspace.getId());
+    }
 }

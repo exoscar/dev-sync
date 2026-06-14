@@ -17,10 +17,6 @@ import java.util.UUID;
 public class IssueValidationService {
     private final ProjectValidationService projectValidationService;
 
-    public UUID parseProjectId(String id) {
-        return projectValidationService.parseProjectId(id);
-    }
-
     public UUID parseIssueId(String id) {
         return Utils.parseUuid(id, "Invalid Issue Id");
     }

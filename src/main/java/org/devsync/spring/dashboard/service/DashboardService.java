@@ -1,21 +1,19 @@
 package org.devsync.spring.dashboard.service;
 
 import lombok.RequiredArgsConstructor;
-import org.devsync.spring.dashboard.dto.PrioritySummary;
-import org.devsync.spring.dashboard.dto.ProjectStatsResponse;
-import org.devsync.spring.dashboard.dto.StatusSummary;
-import org.devsync.spring.dashboard.dto.WorkspaceDashboardResponse;
+import org.devsync.spring.auth.entity.User;
+import org.devsync.spring.dashboard.dto.*;
 import org.devsync.spring.dashboard.mapper.DashboardMapper;
 import org.devsync.spring.issue.projection.IssuePriorityCountProjection;
 import org.devsync.spring.issue.projection.IssueStatusCountProjection;
 import org.devsync.spring.project.service.ProjectAccessService;
 import org.devsync.spring.project.service.ProjectValidationService;
+import org.devsync.spring.workspace.entity.WorkspaceMember;
 import org.devsync.spring.workspace.service.WorkspaceAccessService;
 import org.devsync.spring.workspace.service.WorkspaceValidationService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -71,4 +69,32 @@ public class DashboardService {
     }
 
 
+    public List<MemberStatisticsResponse> getMemberStatistics(String workspaceId) {
+        UUID workspaceUUID = workspaceValidationService.parseWorkspaceId(workspaceId);
+        List<WorkspaceMember> members = workspaceAccessService.getWorkspaceMembers(workspaceUUID);
+        Map<UUID,Long> memberAssignedStats = dashboardQueryService.getMemberAssignedIssueStats(workspaceUUID);
+        Map<UUID,Long> memberDoneStats = dashboardQueryService.getCompletedIssueCounts(workspaceUUID);
+        List<MemberStatisticsResponse> stats = new ArrayList<>();
+        for (WorkspaceMember member : members){
+            User user = member.getUser();
+            long assignedIssues =memberAssignedStats.getOrDefault(user.getId(),0L);
+            long completedIssues =memberDoneStats.getOrDefault(user.getId(),0L);
+            double completionRate =
+                    assignedIssues == 0
+                            ? 0
+                            : Math.round(
+                            (completedIssues * 100.0 / assignedIssues) * 100
+                    ) / 100.0;
+            MemberStatisticsResponse entry = MemberStatisticsResponse.builder()
+                    .userId(user.getId())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .assignedIssues(assignedIssues)
+                    .completedIssues(completedIssues)
+                    .completionRate(completionRate)
+                    .build();
+            stats.add(entry);
+        }
+        return stats;
+    }
 }

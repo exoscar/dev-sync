@@ -105,8 +105,7 @@ public class WorkspaceService {
 
 
     public List<WorkspaceMemberResponse> getWorkspaceMembers(String id) {
-       Workspace workspace = workspaceAccessService.getWorkspaceWithMembershipCheck(id);
-        List<WorkspaceMember> members = workspaceMemberRepository.findByWorkspaceId(workspace.getId());
+        List<WorkspaceMember> members = workspaceAccessService.getWorkspaceMembers(id);
         return members.stream().map(this::mapToWorkspaceMember).toList();
     }
 

@@ -5,6 +5,7 @@ import org.devsync.spring.issue.entity.IssuePriority;
 import org.devsync.spring.issue.entity.IssueStatus;
 import org.devsync.spring.issue.projection.IssuePriorityCountProjection;
 import org.devsync.spring.issue.projection.IssueStatusCountProjection;
+import org.devsync.spring.issue.projection.MemberIssueStatsProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -67,5 +68,30 @@ public interface IssueRepository extends JpaRepository<Issue, UUID>, JpaSpecific
                         group by i.priority
             """)
     List<IssuePriorityCountProjection> getIssuePriorityCount(UUID projectId);
+
+    @Query("""
+            SELECT
+            i.assignee.id AS userId,
+            count(i) AS count
+            FROM Issue i
+            where
+                i.project.workspace.id = :workspaceId
+                AND
+                i.assignee IS NOT NULL
+            GROUP BY i.assignee.id
+            """)
+    List<MemberIssueStatsProjection> getAssignedIssueCounts(UUID workspaceId);
+
+    @Query("""
+            SELECT
+            i.assignee.id AS userId,
+            count(i) AS count
+            FROM Issue i
+            where
+                i.project.workspace.id = :workspaceId
+                AND i.assignee IS NOT NULL
+                AND i.status = org.devsync.spring.issue.entity.IssueStatus.DONE
+            GROUP BY i.assignee.id""")
+    List<MemberIssueStatsProjection> getCompletedIssueCounts(UUID workspaceId);
 
 }

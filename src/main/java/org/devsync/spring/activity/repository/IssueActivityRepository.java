@@ -14,4 +14,6 @@ public interface IssueActivityRepository extends JpaRepository<IssueActivity, UU
             UUID issueId,
             Pageable pageable
     );
+
+    Page<IssueActivity> findAllByIssueProjectWorkspaceId(UUID issueProjectWorkspaceId, Pageable pageable);
 }

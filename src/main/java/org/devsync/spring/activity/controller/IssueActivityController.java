@@ -1,7 +1,7 @@
 package org.devsync.spring.activity.controller;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.devsync.spring.activity.dto.ActivityFeedResponse;
 import org.devsync.spring.activity.dto.IssueActivityResponse;
 import org.devsync.spring.activity.service.IssueActivityService;
 import org.devsync.spring.common.constants.AppConstants;
@@ -22,7 +22,15 @@ public class IssueActivityController {
     public ApiResponse<Page<IssueActivityResponse>> getIssueActivity(@PathVariable String issueId,
                                                                      @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE+"") int page,
                                                                      @RequestParam(defaultValue = AppConstants.DEFAULT_SIZE+"") int size){
-        Page<IssueActivityResponse> responses = issueActivityService.getIssueActivity(issueId,page,size);
+        Page<IssueActivityResponse> responses = issueActivityService.getIssueActivities(issueId,page,size);
+        return ApiResponseUtil.success(responses);
+    }
+
+    @GetMapping("/workspaces/{workspaceId}/activity-feed")
+    public ApiResponse<Page<ActivityFeedResponse>> getActivityFeed(@PathVariable String workspaceId,
+                                                                    @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE+"") int page,
+                                                                    @RequestParam(defaultValue = AppConstants.DEFAULT_SIZE+"") int size){
+        Page<ActivityFeedResponse> responses = issueActivityService.getWorkspaceActivityFeed(workspaceId,page,size);
         return ApiResponseUtil.success(responses);
     }
 }

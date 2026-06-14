@@ -45,7 +45,7 @@ public class IssueController {
         return ApiResponseUtil.success(responses);
     }
 
-    @GetMapping("/projects/{projectId}/issues/my")
+    @GetMapping("/my")
     public ApiResponse<Page<IssueResponse>> getMyAssignedIssues(@PathVariable String projectId,
                                                                 @RequestParam(required = false)
                                                                 IssueStatus status,

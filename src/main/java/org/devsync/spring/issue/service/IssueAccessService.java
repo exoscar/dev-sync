@@ -55,7 +55,25 @@ public class IssueAccessService {
         );
     }
 
-    private Issue getIssue(
+    public IssueContext loadIssueContext(
+            String issueId
+    ) {
+        UUID issueUUID = issueValidationService.parseIssueId(issueId);
+        Issue issue =
+                getIssue(issueUUID);
+        Project project = issue.getProject();
+        WorkspaceMember member =
+                projectAccessService.getCurrentProjectMember(project);
+        return new IssueContext(
+                project,
+                issue,
+                member
+        );
+    }
+
+
+
+    public Issue getIssue(
             UUID projectId,
             UUID issueId
     ) {
@@ -69,6 +87,12 @@ public class IssueAccessService {
                                 "Issue not found",
                                 ErrorCode.NOT_FOUND
                         ));
+    }
+
+    public Issue getIssue(UUID issueId){
+        return issueRepository.findById(issueId).orElseThrow(
+                () -> new BusinessException("Issue not found", ErrorCode.NOT_FOUND)
+        );
     }
 
 }
