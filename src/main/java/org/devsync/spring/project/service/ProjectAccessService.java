@@ -18,6 +18,7 @@ public class ProjectAccessService {
 
     private final ProjectRepository projectRepository;
     private final WorkspaceAccessService workspaceAccessService;
+    private final ProjectValidationService projectValidationService;
 
     public Project getProjectById(UUID projectUUID) {
         return projectRepository.findById(projectUUID).orElseThrow(
@@ -36,6 +37,11 @@ public class ProjectAccessService {
         );
         getCurrentProjectMember(project);
         return project;
+    }
+
+    public Project getProjectWithMembershipCheck(String projectId){
+        UUID projectUUID = projectValidationService.parseProjectId(projectId);
+        return getProjectWithMembershipCheck(projectUUID);
     }
 
 }

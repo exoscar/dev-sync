@@ -15,6 +15,8 @@ import org.devsync.spring.issue.mapper.IssueMapper;
 import org.devsync.spring.issue.repository.IssueRepository;
 import org.devsync.spring.issue.specification.IssueSpecification;
 import org.devsync.spring.project.entity.Project;
+import org.devsync.spring.watcher.entity.IssueWatcher;
+import org.devsync.spring.watcher.service.IssueWatcherService;
 import org.devsync.spring.workspace.entity.WorkspaceMember;
 import org.devsync.spring.workspace.repository.WorkspaceMemberRepository;
 import org.springframework.data.domain.Page;
@@ -38,6 +40,7 @@ public class IssueService {
     private final IssueAccessService issueAccessService;
     private final IssueActivityUtilService activityService;
     private final IssueFactory issueFactory;
+    private final IssueWatcherService issueWatcherService;
 
 
     @Transactional
@@ -48,6 +51,7 @@ public class IssueService {
         issueAuthorizationService.requireContributor(member);
         Issue issue = issueFactory.create(project, request);
         issueRepository.save(issue);
+        issueWatcherService.addCreatorWatcher(issue,context.member().getUser());
         activityService.issueCreated(issue, member.getUser());
         return mapper.ToResponse(issue);
     }
@@ -134,6 +138,7 @@ public class IssueService {
         Issue issue = context.issue();
         validationService.validateAssignee(issue, assigneeId);
         issue.setAssignee(assigneeMembership.getUser());
+        issueWatcherService.addAssigneeWatcher(issue,assigneeMembership.getUser());
         activityService.issueAssigned(issue, member.getUser(), assigneeMembership.getUser());
         return mapper.ToResponse(issue);
     }
