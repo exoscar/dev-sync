@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -74,6 +75,13 @@ public class NotificationService {
         }
         notification.setRead(true);
         notification.setReadAt(Instant.now());
+    }
+
+    @Transactional
+    public void markAllRead(){
+        UUID currUserId = currentUserService.getCurrentUserId();
+        Instant now = Instant.now();
+        repository.markAllRead(currUserId,now);
     }
 
 
