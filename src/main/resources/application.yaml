@@ -19,8 +19,14 @@ spring:
         jdbc:
           batch_size: 50
         order_updates: true
-
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 15MB
+      max-request-size: 15MB
 app:
   jwt:
     secret: ReplaceThisWithVeryLongSecure256BitSecretKeyValue
     expiration-ms: 90000000
+  storage:
+    upload-dir: uploads
