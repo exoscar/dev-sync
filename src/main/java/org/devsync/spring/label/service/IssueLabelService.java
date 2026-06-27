@@ -9,10 +9,13 @@ import org.devsync.spring.label.dto.AddIssueLabelRequest;
 import org.devsync.spring.label.dto.IssueLabelResponse;
 import org.devsync.spring.label.entity.IssueLabel;
 import org.devsync.spring.label.entity.Label;
+import org.devsync.spring.label.event.LabelAddedEvent;
+import org.devsync.spring.label.event.LabelRemovedEvent;
 import org.devsync.spring.label.mapper.IssueLabelMapper;
 import org.devsync.spring.label.repository.IssueLabelRepository;
 import org.devsync.spring.workspace.entity.WorkspaceMember;
 import org.devsync.spring.workspace.service.WorkspaceAccessService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +33,7 @@ public class IssueLabelService {
     private final IssueLabelMapper mapper;
     private final WorkspaceAccessService workspaceAccessService;
     private final IssueLabelRepository issueLabelRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public IssueLabelResponse addLabel(String issueId, @Valid AddIssueLabelRequest request) {
@@ -47,7 +51,16 @@ public class IssueLabelService {
         issueLabel.setLabel(label);
         issueLabel.setCreatedBy(member.getUser());
         issueLabelRepository.save(issueLabel);
-
+        eventPublisher.publishEvent( new LabelAddedEvent(
+                issueUUID,
+                labelUUID,
+                member.getUser().getId(),
+                issue.getProject().getWorkspace().getId(),
+                issue.getProject().getId(),
+                label.getName(),
+                issue.getTitle()
+                )
+        );
         return mapper.toResponse(issueLabel);
 
     }
@@ -58,9 +71,17 @@ public class IssueLabelService {
         UUID labelUUID = labelValidationService.parseLabelId(labelId);
         Issue issue = issueAccessService.getIssue(issueUUID);
         WorkspaceMember member = workspaceAccessService.getCurrentWorkspaceMember(issue.getProject().getWorkspace().getId());
-        labelAccessService.getLabel(member.getWorkspace().getId(),labelUUID);
+        Label label = labelAccessService.getLabel(member.getWorkspace().getId(),labelUUID);
         issueLabelValidationService.validateManageIssueLabelsPermission(member);
         issueLabelRepository.deleteByIssueIdAndLabelId(issueUUID,labelUUID);
+        eventPublisher.publishEvent(new LabelRemovedEvent(
+                issueUUID,labelUUID,
+                member.getUser().getId(),
+                issue.getProject().getWorkspace().getId(),
+                issue.getProject().getId(),
+                label.getName(),
+                issue.getTitle()
+        ));
     }
 
     @Transactional(readOnly = true)

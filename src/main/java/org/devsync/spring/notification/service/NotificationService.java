@@ -1,20 +1,28 @@
 package org.devsync.spring.notification.service;
 
 import lombok.RequiredArgsConstructor;
+import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.common.security.CurrentUserService;
+import org.devsync.spring.notification.dto.CreateNotificationRequest;
 import org.devsync.spring.notification.dto.NotificationResponse;
 import org.devsync.spring.notification.dto.UnreadCountResponse;
 import org.devsync.spring.notification.entity.Notification;
+import org.devsync.spring.notification.entity.NotificationType;
+import org.devsync.spring.notification.entity.ResourceType;
 import org.devsync.spring.notification.mapper.NotificationMapper;
 import org.devsync.spring.notification.repository.NotificationRepository;
 import org.devsync.spring.project.entity.Project;
 import org.devsync.spring.project.service.ProjectAccessService;
+import org.devsync.spring.watcher.entity.IssueWatcher;
+import org.devsync.spring.watcher.service.IssueWatcherAccessService;
+import org.devsync.spring.watcher.service.IssueWatcherService;
 import org.devsync.spring.workspace.entity.Workspace;
 import org.devsync.spring.workspace.service.WorkspaceAccessService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -82,6 +90,28 @@ public class NotificationService {
         UUID currUserId = currentUserService.getCurrentUserId();
         Instant now = Instant.now();
         repository.markAllRead(currUserId,now);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createNotification(CreateNotificationRequest request){
+       List<User> recipients = request.getRecipients();
+       List<Notification> notifications = recipients.stream().map(user -> {
+            Notification notification = new Notification();
+            notification.setMessage(request.getMessage());
+            notification.setTitle(request.getTitle());
+            notification.setRecipient(user);
+            notification.setProjectId(request.getProjectId());
+            notification.setWorkspaceId(request.getWorkspaceId());
+            notification.setResourceType(request.getResourceType());
+            notification.setType(request.getNotificationType());
+            notification.setResourceId(request.getResourceId());
+            return notification;
+       }).toList();
+
+        List<Notification> saved = repository.saveAll(notifications);
+        repository.flush();
+
+        System.out.println(saved);
     }
 
 

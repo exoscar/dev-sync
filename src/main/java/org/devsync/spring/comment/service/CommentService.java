@@ -8,6 +8,7 @@ import org.devsync.spring.comment.dto.CommentResponse;
 import org.devsync.spring.comment.dto.CreateCommentRequest;
 import org.devsync.spring.comment.dto.UpdateCommentRequest;
 import org.devsync.spring.comment.entity.Comment;
+import org.devsync.spring.comment.event.CommentCreatedEvent;
 import org.devsync.spring.comment.repository.CommentRepository;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
@@ -23,6 +24,7 @@ import org.devsync.spring.workspace.entity.Workspace;
 import org.devsync.spring.workspace.entity.WorkspaceMember;
 import org.devsync.spring.workspace.entity.WorkspaceRole;
 import org.devsync.spring.workspace.repository.WorkspaceMemberRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +46,7 @@ public class CommentService {
     private final ProjectAccessService projectAccessService;
     private final CommentAuthorizationService authorizationService;
     private final IssueValidationService issueValidationService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public CommentResponse createComment(String issueId, @Valid CreateCommentRequest request) {
@@ -59,6 +62,15 @@ public class CommentService {
                 member.getUser(),
                 ActivityType.COMMENT_ADDED,
                 "Added a Comment");
+        eventPublisher.publishEvent(new CommentCreatedEvent(
+                issueUUID,
+                comment.getId(),
+                member.getUser().getId(),
+                issue.getProject().getWorkspace().getId(),
+                issue.getProject().getId(),
+                member.getUser().getFirstName(),
+                issue.getTitle()
+        ));
         return mapToCommentResponse(comment);
     }
 

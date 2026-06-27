@@ -10,6 +10,9 @@ import org.devsync.spring.issue.dto.*;
 import org.devsync.spring.issue.entity.Issue;
 import org.devsync.spring.issue.entity.IssuePriority;
 import org.devsync.spring.issue.entity.IssueStatus;
+import org.devsync.spring.issue.event.IssueAssignedEvent;
+import org.devsync.spring.issue.event.IssuePriorityChangedEvent;
+import org.devsync.spring.issue.event.IssueStatusChangedEvent;
 import org.devsync.spring.issue.factory.IssueFactory;
 import org.devsync.spring.issue.mapper.IssueMapper;
 import org.devsync.spring.issue.repository.IssueRepository;
@@ -19,6 +22,7 @@ import org.devsync.spring.watcher.entity.IssueWatcher;
 import org.devsync.spring.watcher.service.IssueWatcherService;
 import org.devsync.spring.workspace.entity.WorkspaceMember;
 import org.devsync.spring.workspace.repository.WorkspaceMemberRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -41,6 +45,7 @@ public class IssueService {
     private final IssueActivityUtilService activityService;
     private final IssueFactory issueFactory;
     private final IssueWatcherService issueWatcherService;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @Transactional
@@ -106,6 +111,14 @@ public class IssueService {
         IssueStatus oldStatus = issue.getStatus();
         issue.setStatus(request.getStatus());
         activityService.issueStatusChanged(issue, member.getUser(), oldStatus);
+        eventPublisher.publishEvent(new IssueStatusChangedEvent(
+                issue.getId(),
+                member.getUser().getId(),
+                oldStatus,
+                request.getStatus(),
+                issue.getProject().getWorkspace().getId(),
+                issue.getProject().getId()
+        ));
         return mapper.ToResponse(issue);
     }
 
@@ -140,6 +153,13 @@ public class IssueService {
         issue.setAssignee(assigneeMembership.getUser());
         issueWatcherService.addAssigneeWatcher(issue,assigneeMembership.getUser());
         activityService.issueAssigned(issue, member.getUser(), assigneeMembership.getUser());
+        eventPublisher.publishEvent(new IssueAssignedEvent(
+                issue.getId(),
+                member.getUser().getId(),
+                assigneeMembership.getUser().getId(),
+                workspaceUUID,
+                project.getId()
+        ));
         return mapper.ToResponse(issue);
     }
 
@@ -153,6 +173,14 @@ public class IssueService {
         validationService.validatePriorityChange(issue, request.getIssuePriority());
         issue.setPriority(request.getIssuePriority());
         activityService.issuePriorityChanged(issue, member.getUser(), oldPriority);
+        eventPublisher.publishEvent(new IssuePriorityChangedEvent(
+                issue.getId(),
+                member.getUser().getId(),
+                oldPriority,
+                request.getIssuePriority(),
+                issue.getProject().getWorkspace().getId(),
+                issue.getProject().getId()
+        ));
         return mapper.ToResponse(issue);
     }
 
