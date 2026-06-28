@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/workspaces/{workspaceId}/search")
+@RequestMapping("/workspaces/{workspaceId}")
 @RequiredArgsConstructor
 public class SearchController {
 
     private final SearchService searchService;
 
-    @GetMapping
+    @GetMapping("/search")
     public ApiResponse<GlobalSearchResponse> globalSearch(@PathVariable UUID workspaceId, @RequestParam String query){
         GlobalSearchResponse response = searchService.search(workspaceId,query);
         return ApiResponseUtil.success(response);
