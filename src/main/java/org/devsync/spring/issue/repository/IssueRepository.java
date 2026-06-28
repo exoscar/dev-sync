@@ -6,11 +6,13 @@ import org.devsync.spring.issue.entity.IssueStatus;
 import org.devsync.spring.issue.projection.IssuePriorityCountProjection;
 import org.devsync.spring.issue.projection.IssueStatusCountProjection;
 import org.devsync.spring.issue.projection.MemberIssueStatsProjection;
+import org.devsync.spring.search.projection.IssueSearchProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -93,5 +95,29 @@ public interface IssueRepository extends JpaRepository<Issue, UUID>, JpaSpecific
                 AND i.status = org.devsync.spring.issue.entity.IssueStatus.DONE
             GROUP BY i.assignee.id""")
     List<MemberIssueStatsProjection> getCompletedIssueCounts(UUID workspaceId);
+
+    @Query(value = """
+            SELECT
+                i.id,
+                i.title,
+                i.status,
+                ts_rank(
+                    i.search_vector,
+                    websearch_to_tsquery('english', :query)
+                ) AS rank,
+                    p.id AS projectId,
+                    p.name AS projectName
+            FROM issue i
+            JOIN project p
+                ON p.id = i.project_id
+            WHERE p.workspace_id = :workspaceId
+              AND i.search_vector @@ websearch_to_tsquery('english', :query)
+            ORDER BY rank DESC
+            LIMIT 15
+            """, nativeQuery = true)
+    List<IssueSearchProjection> searchIssues(
+            @Param("workspaceId") UUID workspaceId,
+            @Param("query") String query
+    );
 
 }
