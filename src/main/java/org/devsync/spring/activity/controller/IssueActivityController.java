@@ -1,5 +1,7 @@
 package org.devsync.spring.activity.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.devsync.spring.activity.dto.ActivityFeedResponse;
 import org.devsync.spring.activity.dto.IssueActivityResponse;
@@ -13,11 +15,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(
+        name = "Activities"
+)
 @RestController
 @RequiredArgsConstructor
 public class IssueActivityController {
     private final IssueActivityService issueActivityService;
 
+    @Operation(
+            summary = "Get Issue Activity"
+    )
     @GetMapping("/issues/{issueId}/activities")
     public ApiResponse<Page<IssueActivityResponse>> getIssueActivity(@PathVariable String issueId,
                                                                      @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE+"") int page,
@@ -26,6 +34,9 @@ public class IssueActivityController {
         return ApiResponseUtil.success(responses);
     }
 
+    @Operation(
+            summary = "Get Activity Feed"
+    )
     @GetMapping("/workspaces/{workspaceId}/activity-feed")
     public ApiResponse<Page<ActivityFeedResponse>> getActivityFeed(@PathVariable String workspaceId,
                                                                     @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE+"") int page,

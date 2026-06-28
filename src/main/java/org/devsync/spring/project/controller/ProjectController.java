@@ -1,5 +1,7 @@
 package org.devsync.spring.project.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.devsync.spring.common.response.ApiResponse;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Projects")
 @RestController
 @RequestMapping("/workspaces/{workspaceId}/projects")
 @RequiredArgsConstructor
@@ -19,6 +22,7 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
+    @Operation(summary = "Create Project")
     @PostMapping()
     public ApiResponse<ProjectResponse> createProject(@PathVariable String workspaceId,
                                                       @Valid @RequestBody CreateProjectRequest request) {
@@ -26,18 +30,21 @@ public class ProjectController {
         return ApiResponseUtil.success(response, "Project creation success");
     }
 
+    @Operation(summary = "Get All Projects")
     @GetMapping
     public ApiResponse<List<ProjectResponse>> getAllProjects(@PathVariable String workspaceId) {
         List<ProjectResponse> responses = projectService.getAllProjects(workspaceId);
         return ApiResponseUtil.success(responses);
     }
 
+    @Operation(summary = "Get Project By Id")
     @GetMapping("/{projectId}")
     public ApiResponse<ProjectResponse> getProjectById(@PathVariable String workspaceId, @PathVariable String projectId) {
         ProjectResponse response = projectService.getProjectById(workspaceId, projectId);
         return ApiResponseUtil.success(response);
     }
 
+    @Operation(summary = "Update Project")
     @PutMapping("/{projectId}")
     public ApiResponse<ProjectResponse> updateProject(@PathVariable String workspaceId, @PathVariable String projectId,
                                                       @Valid @RequestBody UpdateProjectRequest request) {
@@ -45,6 +52,7 @@ public class ProjectController {
         return ApiResponseUtil.success(response, "Project update successful");
     }
 
+    @Operation(summary = "Delete Project")
     @DeleteMapping("/{projectId}")
     public ApiResponse<Void> deleteProject(@PathVariable String workspaceId, @PathVariable String projectId) {
         projectService.deleteProject(workspaceId, projectId);

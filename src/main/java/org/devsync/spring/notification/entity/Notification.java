@@ -17,7 +17,7 @@ import java.util.UUID;
                 @Index(name = "idx_notification_recipient",
                         columnList = "recipient_id"),
                 @Index(name = "idx_notification_recipient_read",
-                        columnList = "recipient_id, read"),
+                        columnList = "recipient_id, is_read"),
                 @Index(
                         name = "idx_notification_recipient_created",
                         columnList = "recipient_id, created_at"

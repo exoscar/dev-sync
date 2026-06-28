@@ -1,5 +1,7 @@
 package org.devsync.spring.comment.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.devsync.spring.comment.dto.CommentResponse;
@@ -12,18 +14,14 @@ import org.devsync.spring.common.util.ApiResponseUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-/*POST   /issues/{issueId}/comments
-GET    /issues/{issueId}/comments
-PUT    /comments/{commentId}
-DELETE /comments/{commentId}*/
-
-
+@Tag(name = "Comments")
 @RestController
 @RequiredArgsConstructor
 public class CommentController {
 
     private final CommentService commentService;
 
+    @Operation(summary = "Create Comment")
     @PostMapping("/issues/{issueId}/comments")
     public ApiResponse<CommentResponse> createComment(@PathVariable String issueId,
                                                       @Valid @RequestBody CreateCommentRequest request){
@@ -31,6 +29,7 @@ public class CommentController {
         return ApiResponseUtil.success(response,"Comment creation successful");
     }
 
+    @Operation(summary = "Get Issue Comments")
     @GetMapping("/issues/{issueId}/comments")
     public ApiResponse<Page<CommentResponse>> getComments(@PathVariable String issueId,
                                                           @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE+"") int page,
@@ -40,6 +39,7 @@ public class CommentController {
         return ApiResponseUtil.success(responses);
     }
 
+    @Operation(summary = "Edit Comment")
     @PutMapping("/comments/{commentId}")
     public ApiResponse<CommentResponse> editComment(@PathVariable String commentId,
                                                     @Valid @RequestBody UpdateCommentRequest updateCommentRequest){
@@ -47,6 +47,7 @@ public class CommentController {
         return ApiResponseUtil.success(response,"Comment Update successful");
     }
 
+    @Operation(summary = "Delete Comment")
     @DeleteMapping("/comments/{commentId}")
     public ApiResponse<Void> deleteComments(@PathVariable String commentId){
         commentService.deleteComment(commentId);

@@ -79,7 +79,6 @@ public class JwtFilter extends OncePerRequestFilter {
                     HttpServletResponse.SC_UNAUTHORIZED,
                     "Invalid or expired token"
             );
-            return;
         }
     }
 }

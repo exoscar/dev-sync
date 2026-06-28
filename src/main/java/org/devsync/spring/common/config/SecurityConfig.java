@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http
@@ -36,11 +37,15 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**"
+                                "/auth/**",
+                                "/api/auth/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
                         ).permitAll()
                         .anyRequest()
                         .authenticated()
-                ) .addFilterBefore(
+                ).addFilterBefore(
                         jwtFilter,
                         UsernamePasswordAuthenticationFilter.class
                 );
@@ -49,6 +54,7 @@ public class SecurityConfig {
     }
 
     @Bean
-   public PasswordEncoder passwordEncoder() {return new BCryptPasswordEncoder();
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
