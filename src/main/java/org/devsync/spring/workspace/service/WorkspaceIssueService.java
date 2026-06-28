@@ -33,14 +33,14 @@ public class WorkspaceIssueService {
         if (request.getStatus() != null) {
             spec = spec.and(IssueSpecification.hasStatus(request.getStatus()));
         }
+        if (request.getProjectId() != null) {
+            spec = spec.and(IssueSpecification.hasProject(request.getProjectId()));
+        }
         if (request.getPriority() != null) {
             spec = spec.and(IssueSpecification.hasPriority(request.getPriority()));
         }
         if (request.getAssigneeId() != null) {
             spec = spec.and(IssueSpecification.hasAssignee(request.getAssigneeId()));
-        }
-        if (request.getProjectId() != null) {
-            spec = spec.and(IssueSpecification.hasProject(request.getProjectId()));
         }
         if (request.getUnassigned() != null && request.getUnassigned()) {
             spec = spec.and(IssueSpecification.isUnassigned());
