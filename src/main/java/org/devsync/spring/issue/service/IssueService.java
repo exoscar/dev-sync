@@ -18,7 +18,6 @@ import org.devsync.spring.issue.mapper.IssueMapper;
 import org.devsync.spring.issue.repository.IssueRepository;
 import org.devsync.spring.issue.specification.IssueSpecification;
 import org.devsync.spring.project.entity.Project;
-import org.devsync.spring.watcher.entity.IssueWatcher;
 import org.devsync.spring.watcher.service.IssueWatcherService;
 import org.devsync.spring.workspace.entity.WorkspaceMember;
 import org.devsync.spring.workspace.repository.WorkspaceMemberRepository;
@@ -58,7 +57,7 @@ public class IssueService {
         issueRepository.save(issue);
         issueWatcherService.addCreatorWatcher(issue,context.member().getUser());
         activityService.issueCreated(issue, member.getUser());
-        return mapper.ToResponse(issue);
+        return mapper.toResponse(issue);
     }
 
     public Page<IssueResponse> getAllIssues(String projectId, int page, int size, IssueFilterRequest filterRequest) {
@@ -75,7 +74,7 @@ public class IssueService {
         }
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Issue> issues = issueRepository.findAll(spec, pageable);
-        return issues.map(mapper::ToResponse);
+        return issues.map(mapper::toResponse);
     }
 
     public Page<IssueResponse> getMyAssignedIssues(String projectId, IssueStatus status, IssuePriority priority, int page, int size) {
@@ -92,13 +91,13 @@ public class IssueService {
         issue.setTitle(request.getTitle().trim());
         issue.setDescription(request.getDescription().trim());
         activityService.issueUpdated(issue, member.getUser());
-        return mapper.ToResponse(issue);
+        return mapper.toResponse(issue);
     }
 
     public IssueResponse getIssueById(String projectId, String issueId) {
         IssueContext context = issueAccessService.loadIssueContext(projectId, issueId);
         Issue issue = context.issue();
-        return mapper.ToResponse(issue);
+        return mapper.toResponse(issue);
     }
 
     @Transactional
@@ -119,7 +118,7 @@ public class IssueService {
                 issue.getProject().getWorkspace().getId(),
                 issue.getProject().getId()
         ));
-        return mapper.ToResponse(issue);
+        return mapper.toResponse(issue);
     }
 
     @Transactional
@@ -160,7 +159,7 @@ public class IssueService {
                 workspaceUUID,
                 project.getId()
         ));
-        return mapper.ToResponse(issue);
+        return mapper.toResponse(issue);
     }
 
     @Transactional
@@ -181,7 +180,7 @@ public class IssueService {
                 issue.getProject().getWorkspace().getId(),
                 issue.getProject().getId()
         ));
-        return mapper.ToResponse(issue);
+        return mapper.toResponse(issue);
     }
 
 
