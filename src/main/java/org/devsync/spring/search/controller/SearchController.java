@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.devsync.spring.common.response.ApiResponse;
 import org.devsync.spring.common.util.ApiResponseUtil;
 import org.devsync.spring.search.dto.GlobalSearchResponse;
-import org.devsync.spring.search.mapper.SearchMapper;
 import org.devsync.spring.search.service.SearchService;
-import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;

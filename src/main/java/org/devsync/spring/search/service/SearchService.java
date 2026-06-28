@@ -16,13 +16,10 @@ import org.devsync.spring.search.projection.ProjectSearchProjection;
 import org.devsync.spring.search.projection.UserSearchProjection;
 import org.devsync.spring.workspace.entity.Workspace;
 import org.devsync.spring.workspace.service.WorkspaceAccessService;
-import org.devsync.spring.workspace.service.WorkspaceValidationService;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
