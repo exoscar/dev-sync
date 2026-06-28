@@ -1,8 +1,10 @@
 # 🚀 DevSync Backend
 
-> A production-inspired **Jira-like Project Management Backend** built with **Java 21 + Spring Boot**, focused on real-world backend architecture, security, analytics, and scalable design.
+> 🚀 Current Release: **v1.0.0 - Production-Ready Collaboration Platform**
+>
+> A production-inspired **Jira-like Project Management Backend** built with **Java 25 + Spring Boot**, focused on real-world backend architecture, security, collaboration, analytics, and scalable design.
 
-![Java|58](https://img.shields.io/badge/Java-25-orange)
+![Java](https://img.shields.io/badge/Java-25-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
 ![JWT](https://img.shields.io/badge/Auth-JWT-red)
@@ -12,20 +14,25 @@
 
 # 🧠 Overview
 
-DevSync is a multi-tenant collaboration platform inspired by Jira.
+DevSync is a multi-tenant collaborative workspace and issue tracking platform inspired by Jira.
 
-The project was built to practice:
+The project was built to practice production-grade backend engineering and real-world software design.
+
+### Core Capabilities
 
 - 🔐 Authentication & Authorization
-- 🏢 Multi-Workspace Management
+- 🏢 Multi-Workspace Collaboration
 - 📁 Project Management
 - 🎯 Issue Tracking
-- 💬 Collaboration Features
-- 📊 Dashboard Analytics
+- 💬 Team Collaboration
+- 🔔 Event-Driven Notifications
+- 📎 File Attachments
+- 📊 Dashboards & Analytics
 - 📝 Activity Auditing
-- ⚡ Clean Backend Architecture
+- 📖 API Documentation
+- ⚡ Production-Oriented Architecture
 
-This is not a CRUD demo project. The goal is to model production-style backend design and engineering practices.
+This is not a CRUD demo project. The focus is on scalable architecture, security, maintainability, and backend engineering best practices.
 
 ---
 
@@ -33,13 +40,14 @@ This is not a CRUD demo project. The goal is to model production-style backend d
 
 ### Backend
 
-- ☕ Java 21
-- 🍃 Spring Boot
+- ☕ Java 25
+- 🍃 Spring Boot 3
 - 🛡️ Spring Security
 - 🔑 JWT Authentication
 - 🐘 PostgreSQL
-- 📦 Spring Data JPA
+- 📦 Spring Data JPA / Hibernate
 - 🔍 JPA Specifications
+- 📖 SpringDoc OpenAPI (Swagger)
 - 🚀 Maven
 - 🧰 Lombok
 
@@ -61,16 +69,18 @@ Repository
 Database
 ```
 
-### Design Patterns Used
+### Design Patterns & Architectural Concepts
 
 - ✅ Service Layer
 - ✅ Repository Pattern
-- ✅ Factory Pattern
 - ✅ DTO Mapping
 - ✅ Context Objects
 - ✅ Access Services
 - ✅ Authorization Services
 - ✅ Validation Services
+- ✅ Event-Driven Architecture
+- ✅ Domain Events
+- ✅ Observer Pattern
 - ✅ Global Exception Handling
 
 ---
@@ -87,7 +97,7 @@ Database
 - ✅ Refresh Token Revocation
 - ✅ Logout
 - ✅ BCrypt Password Hashing
-- ✅ Role-Based Authorization
+- ✅ Role-Based Authorization (RBAC)
 - ✅ Global Exception Handling
 
 ---
@@ -195,6 +205,67 @@ Implemented using **JPA Specifications**.
 
 ---
 
+# 🤝 Collaboration Features
+
+## 🏷️ Labels
+
+- ✅ Workspace-Level Labels
+- ✅ Create Labels
+- ✅ Update Labels
+- ✅ Archive Labels
+- ✅ Assign Labels to Issues
+- ✅ Remove Labels from Issues
+- ✅ View Issue Labels
+
+## 👀 Watchers
+
+- ✅ Watch Issues
+- ✅ Unwatch Issues
+- ✅ Automatic Creator Watchers
+- ✅ Automatic Assignee Watchers
+- ✅ View Watchers
+
+## 🔔 Notifications
+
+### Event-Driven Notifications
+
+Implemented using:
+
+- ApplicationEventPublisher
+- @TransactionalEventListener
+- AFTER_COMMIT Processing
+
+### Supported Notifications
+
+- Issue Assigned
+- Issue Status Changed
+- Issue Priority Changed
+- Comment Added
+- Label Added
+- Label Removed
+
+### Features
+
+- ✅ Notification Feed
+- ✅ Workspace Notifications
+- ✅ Project Notifications
+- ✅ Unread Count
+- ✅ Mark Read
+- ✅ Mark All Read
+
+## 📎 Attachments
+
+- ✅ Upload Attachments
+- ✅ Download Attachments
+- ✅ Delete Attachments
+- ✅ List Attachments
+- ✅ File Type Validation
+- ✅ File Size Validation
+- ✅ Local File Storage
+- ✅ Storage Abstraction Layer
+
+---
+
 # 📝 Activity Tracking
 
 ### Activity Types
@@ -259,6 +330,23 @@ Implemented using **JPA Specifications**.
 
 ---
 
+# 📖 API Documentation
+
+Interactive API documentation is available through Swagger/OpenAPI.
+
+### Features
+
+- ✅ Interactive API Testing
+- ✅ JWT Authentication Support
+- ✅ Endpoint Documentation
+- ✅ Request / Response Schemas
+
+```text
+/swagger-ui/index.html
+```
+
+---
+
 # 🌐 API Highlights
 
 ### Authentication
@@ -295,6 +383,11 @@ GET /workspaces/{workspaceId}/member-statistics
 - ⚡ Service Decomposition
 - 🧠 Clean Architecture Principles
 - 📈 Dashboard Analytics
+- 📎 Multipart File Uploads
+- 🔔 Event-Driven Architecture
+- 🎯 Domain Events
+- 👀 Observer Pattern
+- 📖 OpenAPI / Swagger
 - 🚀 Production-Oriented Design
 
 ---
@@ -309,30 +402,37 @@ Completed
 
 Completed
 
+## ✅ Phase 3 — Collaboration Features
+
+Completed
+
+### Delivered Features
+
+- Labels
+- Watchers
+- Event-Driven Notifications
+- File Attachments
+- Swagger/OpenAPI Documentation
+
 ---
 
-# 🔮 Upcoming
+# 🔮 Roadmap
 
-### Phase 3 — Collaboration
+## Phase 4 — Production Readiness
 
-- 🔔 Notifications
-- 🏷️ Labels / Tags
-- 📎 Attachments
-- 👀 Watchers
+- 🔍 Global Search
+- 📊 Advanced Reporting
+- 🐳 Docker Support
+- ✉️ Email Notifications
+- 🧪 Integration Testing
 
-### Phase 4 — Search & Reporting
+## Future Enhancements
 
-- 🔎 Advanced Search
-- 📊 Reports
-- 💾 Saved Filters
-
-### Phase 5 — Production Readiness
-
-- 📚 Swagger / OpenAPI
-- 🧪 Testing
-- 📈 Monitoring
-- 🚦 Rate Limiting
-- ✉️ Email Verification
+- ⚡ Redis Caching
+- 📡 WebSocket Notifications
+- 📨 Kafka Integration
+- ☁️ Cloud Deployment
+- 🏗️ Microservices Exploration
 
 ---
 
