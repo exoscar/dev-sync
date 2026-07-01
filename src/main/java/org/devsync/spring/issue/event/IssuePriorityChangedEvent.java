@@ -5,9 +5,13 @@ import org.devsync.spring.issue.entity.IssuePriority;
 import java.util.UUID;
 
 public record IssuePriorityChangedEvent(  UUID issueId,
+                                          String title,
+                                          String description,
                                           UUID actorId,
                                           IssuePriority oldPriority,
                                           IssuePriority newPriority,
                                           UUID workspaceId,
-                                          UUID projectId) {
+                                          String workspaceName,
+                                          UUID projectId,
+                                          String projectName) {
 }

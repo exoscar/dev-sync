@@ -112,11 +112,15 @@ public class IssueService {
         activityService.issueStatusChanged(issue, member.getUser(), oldStatus);
         eventPublisher.publishEvent(new IssueStatusChangedEvent(
                 issue.getId(),
+                issue.getTitle(),
+                issue.getDescription(),
                 member.getUser().getId(),
                 oldStatus,
                 request.getStatus(),
                 issue.getProject().getWorkspace().getId(),
-                issue.getProject().getId()
+                issue.getProject().getWorkspace().getName(),
+                issue.getProject().getId(),
+                issue.getProject().getName()
         ));
         return mapper.toResponse(issue);
     }
@@ -154,10 +158,14 @@ public class IssueService {
         activityService.issueAssigned(issue, member.getUser(), assigneeMembership.getUser());
         eventPublisher.publishEvent(new IssueAssignedEvent(
                 issue.getId(),
+                issue.getTitle(),
+                issue.getDescription(),
                 member.getUser().getId(),
                 assigneeMembership.getUser().getId(),
                 workspaceUUID,
-                project.getId()
+                issue.getProject().getWorkspace().getName(),
+                issue.getProject().getId(),
+                issue.getProject().getName()
         ));
         return mapper.toResponse(issue);
     }
@@ -174,11 +182,15 @@ public class IssueService {
         activityService.issuePriorityChanged(issue, member.getUser(), oldPriority);
         eventPublisher.publishEvent(new IssuePriorityChangedEvent(
                 issue.getId(),
+                issue.getTitle(),
+                issue.getDescription(),
                 member.getUser().getId(),
                 oldPriority,
                 request.getIssuePriority(),
                 issue.getProject().getWorkspace().getId(),
-                issue.getProject().getId()
+                issue.getProject().getWorkspace().getName(),
+                issue.getProject().getId(),
+                issue.getProject().getName()
         ));
         return mapper.toResponse(issue);
     }

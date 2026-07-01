@@ -35,6 +35,6 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER project_search_vector_trigger
 BEFORE INSERT OR UPDATE
-ON issue
+ON project
 FOR EACH ROW
 EXECUTE FUNCTION project_search_vector_update();
