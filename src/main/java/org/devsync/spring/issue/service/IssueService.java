@@ -18,7 +18,6 @@ import org.devsync.spring.issue.mapper.IssueMapper;
 import org.devsync.spring.issue.repository.IssueRepository;
 import org.devsync.spring.issue.specification.IssueSpecification;
 import org.devsync.spring.project.entity.Project;
-import org.devsync.spring.watcher.entity.IssueWatcher;
 import org.devsync.spring.watcher.service.IssueWatcherService;
 import org.devsync.spring.workspace.entity.WorkspaceMember;
 import org.devsync.spring.workspace.repository.WorkspaceMemberRepository;
@@ -58,7 +57,7 @@ public class IssueService {
         issueRepository.save(issue);
         issueWatcherService.addCreatorWatcher(issue,context.member().getUser());
         activityService.issueCreated(issue, member.getUser());
-        return mapper.ToResponse(issue);
+        return mapper.toResponse(issue);
     }
 
     public Page<IssueResponse> getAllIssues(String projectId, int page, int size, IssueFilterRequest filterRequest) {
@@ -75,7 +74,7 @@ public class IssueService {
         }
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Issue> issues = issueRepository.findAll(spec, pageable);
-        return issues.map(mapper::ToResponse);
+        return issues.map(mapper::toResponse);
     }
 
     public Page<IssueResponse> getMyAssignedIssues(String projectId, IssueStatus status, IssuePriority priority, int page, int size) {
@@ -92,13 +91,13 @@ public class IssueService {
         issue.setTitle(request.getTitle().trim());
         issue.setDescription(request.getDescription().trim());
         activityService.issueUpdated(issue, member.getUser());
-        return mapper.ToResponse(issue);
+        return mapper.toResponse(issue);
     }
 
     public IssueResponse getIssueById(String projectId, String issueId) {
         IssueContext context = issueAccessService.loadIssueContext(projectId, issueId);
         Issue issue = context.issue();
-        return mapper.ToResponse(issue);
+        return mapper.toResponse(issue);
     }
 
     @Transactional
@@ -113,13 +112,17 @@ public class IssueService {
         activityService.issueStatusChanged(issue, member.getUser(), oldStatus);
         eventPublisher.publishEvent(new IssueStatusChangedEvent(
                 issue.getId(),
+                issue.getTitle(),
+                issue.getDescription(),
                 member.getUser().getId(),
                 oldStatus,
                 request.getStatus(),
                 issue.getProject().getWorkspace().getId(),
-                issue.getProject().getId()
+                issue.getProject().getWorkspace().getName(),
+                issue.getProject().getId(),
+                issue.getProject().getName()
         ));
-        return mapper.ToResponse(issue);
+        return mapper.toResponse(issue);
     }
 
     @Transactional
@@ -155,12 +158,16 @@ public class IssueService {
         activityService.issueAssigned(issue, member.getUser(), assigneeMembership.getUser());
         eventPublisher.publishEvent(new IssueAssignedEvent(
                 issue.getId(),
+                issue.getTitle(),
+                issue.getDescription(),
                 member.getUser().getId(),
                 assigneeMembership.getUser().getId(),
                 workspaceUUID,
-                project.getId()
+                issue.getProject().getWorkspace().getName(),
+                issue.getProject().getId(),
+                issue.getProject().getName()
         ));
-        return mapper.ToResponse(issue);
+        return mapper.toResponse(issue);
     }
 
     @Transactional
@@ -175,13 +182,17 @@ public class IssueService {
         activityService.issuePriorityChanged(issue, member.getUser(), oldPriority);
         eventPublisher.publishEvent(new IssuePriorityChangedEvent(
                 issue.getId(),
+                issue.getTitle(),
+                issue.getDescription(),
                 member.getUser().getId(),
                 oldPriority,
                 request.getIssuePriority(),
                 issue.getProject().getWorkspace().getId(),
-                issue.getProject().getId()
+                issue.getProject().getWorkspace().getName(),
+                issue.getProject().getId(),
+                issue.getProject().getName()
         ));
-        return mapper.ToResponse(issue);
+        return mapper.toResponse(issue);
     }
 
 

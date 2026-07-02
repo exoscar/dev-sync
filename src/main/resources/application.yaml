@@ -3,9 +3,9 @@ spring:
     name: DevSync
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/devsync_db
-    username: postgres
-    password: 8520
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/devsync}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:secret}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -24,9 +24,22 @@ spring:
       enabled: true
       max-file-size: 15MB
       max-request-size: 15MB
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 app:
   jwt:
-    secret: ReplaceThisWithVeryLongSecure256BitSecretKeyValue
+    secret: ${JWT_SECRET}
     expiration-ms: 90000000
   storage:
     upload-dir: uploads

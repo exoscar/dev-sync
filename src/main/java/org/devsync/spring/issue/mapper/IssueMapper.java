@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class IssueMapper {
-    public IssueResponse ToResponse(Issue issue) {
+    public IssueResponse toResponse(Issue issue) {
         User assignee = issue.getAssignee();
         return IssueResponse.builder()
                 .id(issue.getId())
