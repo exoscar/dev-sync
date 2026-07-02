@@ -26,10 +26,13 @@ The project was built to practice production-grade backend engineering and real-
 - 🎯 Issue Tracking
 - 💬 Team Collaboration
 - 🔔 Event-Driven Notifications
+- ✉️ Email Notifications
 - 📎 File Attachments
+- 🔍 Global Search
 - 📊 Dashboards & Analytics
 - 📝 Activity Auditing
 - 📖 API Documentation
+- 🐳 Dockerized Deployment
 - ⚡ Production-Oriented Architecture
 
 This is not a CRUD demo project. The focus is on scalable architecture, security, maintainability, and backend engineering best practices.
@@ -50,6 +53,19 @@ This is not a CRUD demo project. The focus is on scalable architecture, security
 - 📖 SpringDoc OpenAPI (Swagger)
 - 🚀 Maven
 - 🧰 Lombok
+
+### Search
+
+- PostgreSQL Full Text Search (FTS)
+- `tsvector`
+- `ts_rank`
+- `websearch_to_tsquery`
+
+### Deployment
+
+- Docker
+- Docker Compose
+- Docker Volumes
 
 ---
 
@@ -189,6 +205,34 @@ Implemented using **JPA Specifications**.
 
 ---
 
+# 🔍 Global Search
+
+Implemented using **PostgreSQL Full Text Search (FTS)**.
+
+### Search Targets
+
+- Issues
+- Projects
+- Users
+
+### Features
+
+- ✅ Workspace Scoped Search
+- ✅ Relevance Ranking
+- ✅ PostgreSQL Full Text Search
+- ✅ Top Results Aggregation
+- ✅ Fast Search Queries
+
+### PostgreSQL Concepts Used
+
+- to_tsvector()
+- websearch_to_tsquery()
+- ts_rank()
+- GIN Indexes
+- Search Vectors
+
+---
+
 # 💬 Comment System
 
 ### Features
@@ -252,6 +296,26 @@ Implemented using:
 - ✅ Unread Count
 - ✅ Mark Read
 - ✅ Mark All Read
+
+## ✉️ Email Notifications
+
+### Features
+
+- ✅ Issue Assignment Email Notifications
+- ✅ Issue Status Change Email Notifications
+- ✅ HTML Email Templates
+- ✅ JavaMailSender Integration
+- ✅ SMTP Configuration
+- ✅ Recipient Targeting via Events
+
+### Technical Concepts
+
+- Spring Mail
+- JavaMailSender
+- MimeMessage
+- MimeMessageHelper
+- SMTP
+- Event-Driven Email Delivery
 
 ## 📎 Attachments
 
@@ -347,6 +411,26 @@ Interactive API documentation is available through Swagger/OpenAPI.
 
 ---
 
+# 🐳 Docker Support
+
+### Features
+
+- ✅ Dockerized Spring Boot Application
+- ✅ PostgreSQL Container
+- ✅ Docker Compose Setup
+- ✅ Environment Variable Configuration
+- ✅ Persistent Database Volumes
+- ✅ Container Networking
+- ✅ Production-Like Local Deployment
+
+### Deployment
+
+```bash
+docker compose up -d
+```
+
+---
+
 # 🌐 API Highlights
 
 ### Authentication
@@ -379,6 +463,7 @@ GET /workspaces/{workspaceId}/member-statistics
 - 📊 Aggregation Queries
 - 📝 Audit Logging
 - 🔍 JPA Specifications
+- 🔍 PostgreSQL Full Text Search
 - 📄 DTO Mapping
 - ⚡ Service Decomposition
 - 🧠 Clean Architecture Principles
@@ -388,6 +473,10 @@ GET /workspaces/{workspaceId}/member-statistics
 - 🎯 Domain Events
 - 👀 Observer Pattern
 - 📖 OpenAPI / Swagger
+- 🐳 Docker & Docker Compose
+- 🌐 Container Networking
+- 💾 Persistent Volumes
+- ✉️ SMTP Email Integration
 - 🚀 Production-Oriented Design
 
 ---
@@ -411,7 +500,9 @@ Completed
 - Labels
 - Watchers
 - Event-Driven Notifications
+- Email Notifications
 - File Attachments
+- Global Search
 - Swagger/OpenAPI Documentation
 
 ---
@@ -420,15 +511,22 @@ Completed
 
 ## Phase 4 — Production Readiness
 
-- 🔍 Global Search
-- 📊 Advanced Reporting
-- 🐳 Docker Support
-- ✉️ Email Notifications
+- ✅ Global Search
+- ✅ Docker Support
+- ✅ Email Notifications
 - 🧪 Integration Testing
+- 📊 Advanced Reporting
+
+## Phase 5 — Scalability & Performance
+
+- ⚡ Redis Caching
+- 🔐 JWT Blacklisting
+- 📊 Dashboard Caching
+- 🔔 Notification Counter Caching
+- 🚀 Async Processing
 
 ## Future Enhancements
 
-- ⚡ Redis Caching
 - 📡 WebSocket Notifications
 - 📨 Kafka Integration
 - ☁️ Cloud Deployment
