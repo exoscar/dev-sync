@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
 import org.devsync.spring.common.security.CurrentUserService;
+import org.devsync.spring.dashboard.event.DashboardCacheInvalidationEvent;
+import org.devsync.spring.infrastructure.redis.RedisService;
 import org.devsync.spring.issue.context.IssueContext;
 import org.devsync.spring.issue.dto.*;
 import org.devsync.spring.issue.entity.Issue;
@@ -29,6 +31,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -45,6 +49,7 @@ public class IssueService {
     private final IssueFactory issueFactory;
     private final IssueWatcherService issueWatcherService;
     private final ApplicationEventPublisher eventPublisher;
+    private final RedisService redisService;
 
 
     @Transactional
@@ -57,6 +62,12 @@ public class IssueService {
         issueRepository.save(issue);
         issueWatcherService.addCreatorWatcher(issue,context.member().getUser());
         activityService.issueCreated(issue, member.getUser());
+        eventPublisher.publishEvent(
+                new DashboardCacheInvalidationEvent(
+                        project.getWorkspace().getId(),
+                        project.getId()
+                )
+        );
         return mapper.toResponse(issue);
     }
 
@@ -97,6 +108,8 @@ public class IssueService {
     public IssueResponse getIssueById(String projectId, String issueId) {
         IssueContext context = issueAccessService.loadIssueContext(projectId, issueId);
         Issue issue = context.issue();
+        Optional<String> value =
+                redisService.get("devsync:test", String.class);
         return mapper.toResponse(issue);
     }
 
@@ -122,6 +135,12 @@ public class IssueService {
                 issue.getProject().getId(),
                 issue.getProject().getName()
         ));
+        eventPublisher.publishEvent(
+                new DashboardCacheInvalidationEvent(
+                        issue.getProject().getWorkspace().getId(),
+                        issue.getProject().getId()
+                )
+        );
         return mapper.toResponse(issue);
     }
 
@@ -133,6 +152,12 @@ public class IssueService {
         Issue issue = context.issue();
         activityService.issueDeleted(issue, member.getUser());
         issueRepository.delete(issue);
+        eventPublisher.publishEvent(
+                new DashboardCacheInvalidationEvent(
+                        issue.getProject().getWorkspace().getId(),
+                        issue.getProject().getId()
+                )
+        );
     }
 
     @Transactional
@@ -167,6 +192,12 @@ public class IssueService {
                 issue.getProject().getId(),
                 issue.getProject().getName()
         ));
+        eventPublisher.publishEvent(
+                new DashboardCacheInvalidationEvent(
+                        issue.getProject().getWorkspace().getId(),
+                        issue.getProject().getId()
+                )
+        );
         return mapper.toResponse(issue);
     }
 
@@ -192,6 +223,12 @@ public class IssueService {
                 issue.getProject().getId(),
                 issue.getProject().getName()
         ));
+        eventPublisher.publishEvent(
+                new DashboardCacheInvalidationEvent(
+                        issue.getProject().getWorkspace().getId(),
+                        issue.getProject().getId()
+                )
+        );
         return mapper.toResponse(issue);
     }
 

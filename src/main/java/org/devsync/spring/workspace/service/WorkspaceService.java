@@ -5,16 +5,20 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.auth.repository.UserRepository;
+import org.devsync.spring.cache.WorkspaceMembershipCache;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
 import org.devsync.spring.common.security.CurrentUserService;
+import org.devsync.spring.infrastructure.redis.RedisService;
 import org.devsync.spring.user.dto.UserResponse;
 import org.devsync.spring.workspace.dto.*;
 import org.devsync.spring.workspace.entity.Workspace;
 import org.devsync.spring.workspace.entity.WorkspaceMember;
 import org.devsync.spring.workspace.entity.WorkspaceRole;
+import org.devsync.spring.workspace.event.WorkspaceMembershipChangedEvent;
 import org.devsync.spring.workspace.repository.WorkspaceMemberRepository;
 import org.devsync.spring.workspace.repository.WorkspaceRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +39,9 @@ public class WorkspaceService {
     private final UserRepository userRepository;
     private final WorkspaceAccessService workspaceAccessService;
     private final WorkspaceValidationService validationService;
+    private final RedisService redisService;
+    private final WorkspaceMembershipCache workspaceMembershipCache;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public WorkspaceResponse createWorkspace(CreateWorkspaceRequest request) {
@@ -133,7 +140,14 @@ public class WorkspaceService {
             throw new BusinessException("Access Denied: Cannot assign member role", ErrorCode.FORBIDDEN);
         }
         tarMember.setRole(request.getRole());
+
         workspaceMemberRepository.save(tarMember);
+        eventPublisher.publishEvent(
+                new WorkspaceMembershipChangedEvent(
+                        workspaceId,
+                        tarMember.getUser().getId()
+                )
+        );
         return mapToMemberResponse(tarMember);
     }
 
@@ -160,6 +174,12 @@ public class WorkspaceService {
             throw new BusinessException("Access Denied: You dont have access to delete this member", ErrorCode.FORBIDDEN);
         }
         workspaceMemberRepository.delete(tarMember);
+        eventPublisher.publishEvent(
+                new WorkspaceMembershipChangedEvent(
+                        workspaceId,
+                        tarMember.getUser().getId()
+                )
+        );
     }
 
     private MemberResponse mapToMemberResponse(WorkspaceMember member) {
