@@ -1,5 +1,6 @@
 package org.devsync.spring.notification.listener;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.auth.repository.UserRepository;
@@ -15,6 +16,7 @@ import org.devsync.spring.notification.entity.ResourceType;
 import org.devsync.spring.notification.service.NotificationService;
 import org.devsync.spring.watcher.entity.IssueWatcher;
 import org.devsync.spring.watcher.service.IssueWatcherAccessService;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -29,7 +31,7 @@ public class NotificationEventHandler {
     private final NotificationService notificationService;
     private final UserRepository userRepository;
 
-
+    @Async("devSyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleIssueAssigned(IssueAssignedEvent issueAssignedEvent) {
         if (issueAssignedEvent.actorId().equals(issueAssignedEvent.assigneeId())) {
@@ -49,6 +51,7 @@ public class NotificationEventHandler {
         notificationService.createNotification(request);
     }
 
+    @Async("devSyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleIssueStatusChange(IssueStatusChangedEvent event) {
         List<User> users =
@@ -72,6 +75,7 @@ public class NotificationEventHandler {
         notificationService.createNotification(request);
     }
 
+    @Async("devSyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleIssuePriorityChange(IssuePriorityChangedEvent event) {
         List<User> users = getWatcherRecipients(event.issueId(), event.actorId());
@@ -90,6 +94,7 @@ public class NotificationEventHandler {
         notificationService.createNotification(request);
     }
 
+    @Async("devSyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCommentCreation(CommentCreatedEvent event) {
         List<User> users = getWatcherRecipients(event.issueId(), event.actorId());
@@ -108,6 +113,7 @@ public class NotificationEventHandler {
         notificationService.createNotification(request);
     }
 
+    @Async("devSyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleLabelAdded(LabelAddedEvent event) {
         List<User> users = getWatcherRecipients(event.issueId(), event.actorId());
@@ -126,6 +132,7 @@ public class NotificationEventHandler {
         notificationService.createNotification(request);
     }
 
+    @Async("devSyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleLabelRemoved(LabelRemovedEvent event) {
         List<User> users = getWatcherRecipients(event.issueId(), event.actorId());
@@ -143,6 +150,7 @@ public class NotificationEventHandler {
                 .build();
         notificationService.createNotification(request);
     }
+
 
     private List<User> getWatcherRecipients(
             UUID issueId,
