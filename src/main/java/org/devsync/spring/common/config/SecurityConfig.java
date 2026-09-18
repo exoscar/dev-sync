@@ -36,6 +36,7 @@ public class SecurityConfig {
                         )
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/logout").authenticated()
                         .requestMatchers(
                                 "/auth/**",
                                 "/api/auth/**",

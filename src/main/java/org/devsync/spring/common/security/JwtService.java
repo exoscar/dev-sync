@@ -31,7 +31,9 @@ public class JwtService {
 
     public String generateAccessToken(UUID userId){
         long now = System.currentTimeMillis();
+        String jti = UUID.randomUUID().toString();
         return Jwts.builder()
+                .id(jti)
                 .subject(userId.toString())
                 .issuedAt(new Date(now))
                 .expiration(new Date(now + expirationMs))
@@ -47,6 +49,14 @@ public class JwtService {
         return UUID.fromString(
                 extractClaims(token).getSubject()
         );
+    }
+
+    public Date extractExpiration(String token) {
+        return extractClaims(token).getExpiration();
+    }
+
+    public String extractJti(String token) {
+        return extractClaims(token).getId();
     }
 
     public boolean isTokenValid(String token) {

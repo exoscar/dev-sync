@@ -11,6 +11,8 @@ import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.auth.repository.UserRepository;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
+import org.devsync.spring.common.security.CurrentUserService;
+import org.devsync.spring.common.security.JwtBlacklistService;
 import org.devsync.spring.common.security.JwtService;
 import org.devsync.spring.user.entity.Role;
 import org.devsync.spring.user.repository.RoleRepository;
@@ -26,6 +28,8 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final JwtBlacklistService jwtBlacklistService;
+    private final CurrentUserService currentUserService;
 
 
     public RegisterResponse registerUser(RegisterRequest request) {
@@ -74,5 +78,19 @@ public class AuthService {
 
         return  LoginResponse.builder().token(token).build();
 
+    }
+
+    public void logout() {
+
+        if (!jwtService.isTokenValid(currentUserService.getCurrentToken())) {
+            throw new BusinessException(
+                    "Invalid or expired token",
+                    ErrorCode.UNAUTHORIZED
+            );
+        }
+
+        jwtBlacklistService.blacklist(currentUserService.getCurrentToken());
+
+        log.info("JWT token blacklisted successfully");
     }
 }
