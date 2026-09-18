@@ -46,6 +46,10 @@ public class RedisKey {
         return PREFIX + "notifications:"+userId;
     }
 
+    public static String jwtBlacklist(String jti) {
+        return PREFIX + "jwt:blacklist:" + jti;
+    }
+
 
 
 }

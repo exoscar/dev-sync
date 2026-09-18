@@ -24,6 +24,20 @@ public class CurrentUserService {
         }
         return user;
     }
+    public String getCurrentToken() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null ||
+                !(authentication.getCredentials() instanceof String token)) {
+            throw new BusinessException(
+                    "Authentication token not found",
+                    ErrorCode.UNAUTHORIZED
+            );
+        }
+
+        return token;
+    }
 
     public UUID getCurrentUserId(){
         return getCurrentUser().getUserId();

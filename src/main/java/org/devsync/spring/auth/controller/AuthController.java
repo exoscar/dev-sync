@@ -9,6 +9,8 @@ import org.devsync.spring.auth.dto.LoginResponse;
 import org.devsync.spring.auth.dto.RegisterRequest;
 import org.devsync.spring.auth.dto.RegisterResponse;
 import org.devsync.spring.auth.service.AuthService;
+import org.devsync.spring.common.exception.BusinessException;
+import org.devsync.spring.common.exception.ErrorCode;
 import org.devsync.spring.common.response.ApiResponse;
 import org.devsync.spring.common.security.CurrentUserService;
 import org.devsync.spring.common.util.ApiResponseUtil;
@@ -26,15 +28,27 @@ public class AuthController {
 
     @Operation(summary = "Register User")
     @PostMapping("/register")
-    public ApiResponse<RegisterResponse> register(@Valid @RequestBody RegisterRequest registerRequest){
+    public ApiResponse<RegisterResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
         RegisterResponse response = authService.registerUser(registerRequest);
-        return ApiResponseUtil.success(response,"User registration successful");
+        return ApiResponseUtil.success(response, "User registration successful");
     }
 
     @Operation(summary = "User Login")
     @PostMapping("/login")
-    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest){
+    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         LoginResponse response = authService.loginUser(loginRequest);
-        return ApiResponseUtil.success(response,"User Logged In");
+        return ApiResponseUtil.success(response, "User Logged In");
     }
+
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout() {
+
+        authService.logout();
+
+        return ApiResponseUtil.success(
+                "User logged out successfully"
+        );
+    }
+
+
 }

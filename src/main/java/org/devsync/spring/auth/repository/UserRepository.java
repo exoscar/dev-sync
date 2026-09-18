@@ -1,6 +1,7 @@
 package org.devsync.spring.auth.repository;
 
 import org.devsync.spring.auth.entity.User;
+import org.devsync.spring.email.dto.EmailRecipient;
 import org.devsync.spring.search.projection.UserSearchProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
