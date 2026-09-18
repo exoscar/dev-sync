@@ -5,17 +5,13 @@ import org.devsync.spring.cache.WorkspaceMembershipCache;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
 import org.devsync.spring.common.security.CurrentUserService;
-import org.devsync.spring.infrastructure.redis.RedisService;
-import org.devsync.spring.workspace.dto.WorkspaceMembershipCacheEntry;
 import org.devsync.spring.workspace.entity.Workspace;
 import org.devsync.spring.workspace.entity.WorkspaceMember;
 import org.devsync.spring.workspace.repository.WorkspaceMemberRepository;
 import org.devsync.spring.workspace.repository.WorkspaceRepository;
-import org.hibernate.jdbc.Work;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -31,19 +27,13 @@ public class WorkspaceAccessService {
         return getWorkspaceWithMembershipCheck(validationService.parseWorkspaceId(workspaceId));
     }
 
-    public Workspace getWorkspaceWithMembershipCheck(UUID workspaceId) {
+    public Workspace getWorkspaceWithMembershipCheck(UUID workspaceId){
+        Workspace workspace = getWorkspaceById(workspaceId);
         UUID currentUser = currentUserService.getCurrentUserId();
-        Optional<WorkspaceMembershipCacheEntry> entry = workspaceMembershipCache.get(workspaceId, currentUser);
-        if(entry.isEmpty()){
-            WorkspaceMember member =
-                   getWorkspaceMember(workspaceId,currentUser);
-            workspaceMembershipCache.put(
-                    workspaceId,
-                    currentUser,
-                    member.getRole()
-            );
+        if (!workspaceMemberRepository.existsByWorkspaceIdAndUserId(workspaceId, currentUser)) {
+            throw new BusinessException("You do not have access to this workspace", ErrorCode.FORBIDDEN);
         }
-        return getWorkspaceById(workspaceId);
+        return workspace;
     }
 
     public Workspace getWorkspaceById(UUID workspaceId) {

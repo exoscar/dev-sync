@@ -8,7 +8,6 @@ import org.devsync.spring.issue.service.IssueValidationService;
 import org.devsync.spring.watcher.entity.IssueWatcher;
 import org.devsync.spring.watcher.repository.IssueWatcherRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;

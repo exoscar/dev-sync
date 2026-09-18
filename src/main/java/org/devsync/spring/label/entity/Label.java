@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.devsync.spring.common.entity.BaseEntity;
 import org.devsync.spring.workspace.entity.Workspace;
-import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 

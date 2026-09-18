@@ -2,7 +2,6 @@ package org.devsync.spring.user.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import org.devsync.spring.user.entity.Role;
 
 import java.util.UUID;
 

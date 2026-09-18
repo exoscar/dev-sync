@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
-import org.devsync.spring.email.dto.EmailRecipient;
 import org.devsync.spring.issue.entity.Issue;
 import org.devsync.spring.issue.service.IssueAccessService;
 import org.devsync.spring.issue.service.IssueValidationService;

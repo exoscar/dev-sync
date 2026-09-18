@@ -1,6 +1,5 @@
 package org.devsync.spring.attachment.service;
 
-import lombok.RequiredArgsConstructor;
 import org.devsync.spring.common.config.StorageProperties;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;

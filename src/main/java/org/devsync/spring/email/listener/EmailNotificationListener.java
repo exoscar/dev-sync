@@ -15,19 +15,13 @@ import org.devsync.spring.email.service.EmailNotificationService;
 import org.devsync.spring.issue.event.IssueAssignedEvent;
 import org.devsync.spring.issue.event.IssuePriorityChangedEvent;
 import org.devsync.spring.issue.event.IssueStatusChangedEvent;
-import org.devsync.spring.notification.dto.CreateNotificationRequest;
-import org.devsync.spring.notification.entity.NotificationType;
-import org.devsync.spring.notification.entity.ResourceType;
-import org.devsync.spring.watcher.entity.IssueWatcher;
 import org.devsync.spring.watcher.service.IssueWatcherAccessService;
-import org.devsync.spring.watcher.service.IssueWatcherService;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor

@@ -1,7 +1,5 @@
 package org.devsync.spring.attachment.mapper;
 
-import lombok.Builder;
-import lombok.Data;
 import org.devsync.spring.attachment.dto.AttachmentResponse;
 import org.devsync.spring.attachment.entity.Attachment;
 import org.springframework.stereotype.Component;

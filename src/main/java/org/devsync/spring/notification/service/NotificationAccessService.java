@@ -1,10 +1,8 @@
 package org.devsync.spring.notification.service;
 
 import lombok.RequiredArgsConstructor;
-import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
-import org.devsync.spring.common.security.CurrentUserService;
 import org.devsync.spring.notification.entity.Notification;
 import org.devsync.spring.notification.repository.NotificationRepository;
 import org.springframework.stereotype.Service;

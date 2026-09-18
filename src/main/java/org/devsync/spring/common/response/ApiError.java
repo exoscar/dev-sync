@@ -7,7 +7,6 @@ import org.devsync.spring.common.exception.ErrorCode;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.List;
 
 @Data
 @Builder

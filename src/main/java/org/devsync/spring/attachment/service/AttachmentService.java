@@ -12,7 +12,6 @@ import org.devsync.spring.common.util.Utils;
 import org.devsync.spring.issue.context.IssueContext;
 import org.devsync.spring.issue.service.IssueAccessService;
 import org.devsync.spring.issue.service.IssueAuthorizationService;
-import org.jspecify.annotations.NonNull;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

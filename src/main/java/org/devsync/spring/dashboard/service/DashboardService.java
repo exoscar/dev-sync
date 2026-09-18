@@ -7,7 +7,6 @@ import org.devsync.spring.cache.ProjectDashboardCache;
 import org.devsync.spring.cache.WorkspaceDashboardCache;
 import org.devsync.spring.dashboard.dto.*;
 import org.devsync.spring.dashboard.mapper.DashboardMapper;
-import org.devsync.spring.infrastructure.redis.RedisService;
 import org.devsync.spring.issue.projection.IssuePriorityCountProjection;
 import org.devsync.spring.issue.projection.IssueStatusCountProjection;
 import org.devsync.spring.project.service.ProjectAccessService;

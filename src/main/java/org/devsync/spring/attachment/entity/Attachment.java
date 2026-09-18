@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.common.entity.BaseEntity;
 import org.devsync.spring.issue.entity.Issue;
-import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 

@@ -1,6 +1,5 @@
 package org.devsync.spring.notification.listener;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.auth.repository.UserRepository;

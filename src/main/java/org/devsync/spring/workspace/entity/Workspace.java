@@ -1,7 +1,6 @@
 package org.devsync.spring.workspace.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.devsync.spring.auth.entity.User;
