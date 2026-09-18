@@ -15,7 +15,7 @@ import org.devsync.spring.workspace.dto.*;
 import org.devsync.spring.workspace.entity.Workspace;
 import org.devsync.spring.workspace.entity.WorkspaceMember;
 import org.devsync.spring.workspace.entity.WorkspaceRole;
-import org.devsync.spring.workspace.event.WorkspaceMembershipChangedEvent;
+import org.devsync.spring.workspace.event.WorkspaceMembershipCacheInvalidationEvent;
 import org.devsync.spring.workspace.repository.WorkspaceMemberRepository;
 import org.devsync.spring.workspace.repository.WorkspaceRepository;
 import org.springframework.context.ApplicationEventPublisher;
@@ -107,6 +107,12 @@ public class WorkspaceService {
         member.setUser(user);
         member.setRole(request.getRole());
         workspaceMemberRepository.save(member);
+        eventPublisher.publishEvent(
+                new WorkspaceMembershipCacheInvalidationEvent(
+                        workspaceId,
+                        user.getId()
+                )
+        );
         return mapToMemberResponse(member);
     }
 
@@ -143,7 +149,7 @@ public class WorkspaceService {
 
         workspaceMemberRepository.save(tarMember);
         eventPublisher.publishEvent(
-                new WorkspaceMembershipChangedEvent(
+                new WorkspaceMembershipCacheInvalidationEvent(
                         workspaceId,
                         tarMember.getUser().getId()
                 )
@@ -175,7 +181,7 @@ public class WorkspaceService {
         }
         workspaceMemberRepository.delete(tarMember);
         eventPublisher.publishEvent(
-                new WorkspaceMembershipChangedEvent(
+                new WorkspaceMembershipCacheInvalidationEvent(
                         workspaceId,
                         tarMember.getUser().getId()
                 )

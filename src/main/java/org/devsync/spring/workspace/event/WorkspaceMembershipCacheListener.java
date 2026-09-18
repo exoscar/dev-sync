@@ -12,7 +12,7 @@ public class WorkspaceMembershipCacheListener {
 private final WorkspaceMembershipCache workspaceMembershipCache;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleMembershipChange(WorkspaceMembershipChangedEvent event){
+    public void handleMembershipChange(WorkspaceMembershipCacheInvalidationEvent event){
         workspaceMembershipCache.evict(event.workspaceId(),event.userId());
     }
 }
