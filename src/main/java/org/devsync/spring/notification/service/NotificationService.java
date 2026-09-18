@@ -2,6 +2,7 @@ package org.devsync.spring.notification.service;
 
 import lombok.RequiredArgsConstructor;
 import org.devsync.spring.auth.entity.User;
+import org.devsync.spring.cache.UnreadNotificationCache;
 import org.devsync.spring.common.security.CurrentUserService;
 import org.devsync.spring.notification.dto.CreateNotificationRequest;
 import org.devsync.spring.notification.dto.NotificationResponse;
@@ -9,6 +10,7 @@ import org.devsync.spring.notification.dto.UnreadCountResponse;
 import org.devsync.spring.notification.entity.Notification;
 import org.devsync.spring.notification.entity.NotificationType;
 import org.devsync.spring.notification.entity.ResourceType;
+import org.devsync.spring.notification.event.UnreadNotificationEvent;
 import org.devsync.spring.notification.mapper.NotificationMapper;
 import org.devsync.spring.notification.repository.NotificationRepository;
 import org.devsync.spring.project.entity.Project;
@@ -18,6 +20,7 @@ import org.devsync.spring.watcher.service.IssueWatcherAccessService;
 import org.devsync.spring.watcher.service.IssueWatcherService;
 import org.devsync.spring.workspace.entity.Workspace;
 import org.devsync.spring.workspace.service.WorkspaceAccessService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -39,6 +43,8 @@ public class NotificationService {
     private final NotificationMapper mapper;
     private final NotificationValidationService validationService;
     private final NotificationAccessService accessService;
+    private final UnreadNotificationCache unreadNotificationCache;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
     public Page<NotificationResponse> getMyWorkspaceNotifications(String workspaceId, int page, int size) {
@@ -69,8 +75,14 @@ public class NotificationService {
     @Transactional(readOnly = true)
     public UnreadCountResponse getUnreadCount() {
         UUID currUserId = currentUserService.getCurrentUserId();
-        long count = repository.countByRecipientIdAndIsReadFalse(currUserId);
-        return mapper.toRespone(count);
+        Optional<Long> cache = unreadNotificationCache.get(currUserId);
+        if(cache.isEmpty()){
+            long count = repository.countByRecipientIdAndIsReadFalse(currUserId);
+            unreadNotificationCache.put(currUserId,count);
+            return mapper.toRespone(count);
+        }
+
+        return mapper.toRespone(cache.get());
     }
 
     @Transactional
@@ -83,6 +95,11 @@ public class NotificationService {
         }
         notification.setRead(true);
         notification.setReadAt(Instant.now());
+        applicationEventPublisher.publishEvent(
+                new UnreadNotificationEvent(
+                        currUserId
+                )
+        );
     }
 
     @Transactional
@@ -90,6 +107,11 @@ public class NotificationService {
         UUID currUserId = currentUserService.getCurrentUserId();
         Instant now = Instant.now();
         repository.markAllRead(currUserId,now);
+        applicationEventPublisher.publishEvent(
+                new UnreadNotificationEvent(
+                        currUserId
+                )
+        );
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -108,10 +130,13 @@ public class NotificationService {
             return notification;
        }).toList();
 
-        List<Notification> saved = repository.saveAll(notifications);
+        repository.saveAll(notifications);
         repository.flush();
-
-        System.out.println(saved);
+        recipients.forEach(user -> {
+            applicationEventPublisher.publishEvent(
+                    new UnreadNotificationEvent(user.getId())
+            );
+        });
     }
 
 

@@ -6,6 +6,7 @@ import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
 import org.devsync.spring.common.security.CurrentUserService;
 import org.devsync.spring.common.util.Utils;
+import org.devsync.spring.dashboard.event.DashboardCacheInvalidationEvent;
 import org.devsync.spring.project.dto.CreateProjectRequest;
 import org.devsync.spring.project.dto.ProjectResponse;
 import org.devsync.spring.project.dto.UpdateProjectRequest;
@@ -16,6 +17,7 @@ import org.devsync.spring.workspace.entity.WorkspaceMember;
 import org.devsync.spring.workspace.entity.WorkspaceRole;
 import org.devsync.spring.workspace.repository.WorkspaceMemberRepository;
 import org.devsync.spring.workspace.repository.WorkspaceRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final WorkspaceRepository workspaceRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public ProjectResponse createProject(String id, @Valid CreateProjectRequest request) {
@@ -54,7 +57,12 @@ public class ProjectService {
         project.setDescription(request.getDescription());
         project.setWorkspace(workspace);
         projectRepository.save(project);
-
+        eventPublisher.publishEvent(
+                new DashboardCacheInvalidationEvent(
+                        workspaceId,
+                        project.getId()
+                )
+        );
         return maptoProjectResponse(project);
 
     }
@@ -131,6 +139,12 @@ public class ProjectService {
             throw new BusinessException("Access Denied: You do not have access to delete project", ErrorCode.FORBIDDEN);
         }
         projectRepository.delete(project);
+        eventPublisher.publishEvent(
+                new DashboardCacheInvalidationEvent(
+                        workspaceUUID,
+                        projectId
+                )
+        );
     }
 
 
