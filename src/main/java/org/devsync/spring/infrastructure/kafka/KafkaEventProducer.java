@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.ExecutionException;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -31,5 +33,29 @@ public class KafkaEventProducer {
                             result.getRecordMetadata().offset()
                     );
                 });
+    }
+    public void sendAndWait(
+            String topic,
+            String key,
+            Object event
+    ) {
+        try {
+            kafkaTemplate
+                    .send(topic, key, event)
+                    .get();
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(
+                    "Kafka publishing interrupted",
+                    e
+            );
+
+        } catch (ExecutionException e) {
+            throw new IllegalStateException(
+                    "Kafka publishing failed",
+                    e
+            );
+        }
     }
 }

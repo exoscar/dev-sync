@@ -17,7 +17,7 @@ public class KafkaIssueEventPublisher {
 
     private final KafkaEventProducer kafkaEventProducer;
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+//    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void publishIssueAssigned(IssueAssignedEvent event){
         IssueAssignedKafkaEvent kafkaEvent =
                 new IssueAssignedKafkaEvent(

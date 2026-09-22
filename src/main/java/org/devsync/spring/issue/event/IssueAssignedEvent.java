@@ -1,7 +1,9 @@
 package org.devsync.spring.issue.event;
 import java.util.UUID;
 
-public record IssueAssignedEvent( UUID issueId,
+public record IssueAssignedEvent(
+        UUID eventId,
+        UUID issueId,
                                   String title,
                                   String description,
                                   UUID actorId,

@@ -11,28 +11,35 @@ import org.springframework.util.backoff.FixedBackOff;
 @Configuration
 public class KafkaConsumerErrorHandlerConfig {
 
-    @Bean
-    public DefaultErrorHandler kafkaErrorHandler(
-            DeadLetterPublishingRecoverer recoverer
-    ) {
+    /*
+    * Blocking Retry Mechanism
+    *
+    * */
 
-        FixedBackOff backOff = new FixedBackOff(
-                1000L, // 1 second between retries
-                2L     // 2 retries after the initial attempt
-        );
+    // below code commented because to using non blocking retry mechanism
 
-        return new DefaultErrorHandler(recoverer,backOff);
-    }
-
-    @Bean
-    public DeadLetterPublishingRecoverer deadLetterPublishingRecoverer(
-            KafkaTemplate<String, Object> kafkaTemplate
-    ) {
-        return new DeadLetterPublishingRecoverer(
-                kafkaTemplate,
-                (record, exception) -> new TopicPartition(
-                        record.topic() + ".DLT", record.partition()
-                )
-        );
-    }
+//    @Bean
+//    public DefaultErrorHandler kafkaErrorHandler(
+//            DeadLetterPublishingRecoverer recoverer
+//    ) {
+//
+//        FixedBackOff backOff = new FixedBackOff(
+//                1000L, // 1 second between retries
+//                2L     // 2 retries after the initial attempt
+//        );
+//
+//        return new DefaultErrorHandler(recoverer,backOff);
+//    }
+//
+//    @Bean
+//    public DeadLetterPublishingRecoverer deadLetterPublishingRecoverer(
+//            KafkaTemplate<String, Object> kafkaTemplate
+//    ) {
+//        return new DeadLetterPublishingRecoverer(
+//                kafkaTemplate,
+//                (record, exception) -> new TopicPartition(
+//                        record.topic() + ".DLT", record.partition()
+//                )
+//        );
+//    }
 }
