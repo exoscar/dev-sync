@@ -37,6 +37,13 @@ services:
     ports:
       - "6379:6379"
     restart: unless-stopped
+
+  kafka:
+    image: apache/kafka:4.0.0
+    container_name: devsync-kafka
+    ports:
+      - "9092:9092"
+
 volumes:
   postgres_data:
 

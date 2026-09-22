@@ -29,27 +29,7 @@ import java.util.UUID;
 public class NotificationEventHandler {
     private final IssueWatcherAccessService issueWatcherAccessService;
     private final NotificationService notificationService;
-    private final UserRepository userRepository;
 
-    @Async("devSyncTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleIssueAssigned(IssueAssignedEvent issueAssignedEvent) {
-        if (issueAssignedEvent.actorId().equals(issueAssignedEvent.assigneeId())) {
-            return;
-        }
-        User assignee = userRepository.getReferenceById(issueAssignedEvent.assigneeId());
-        CreateNotificationRequest request = CreateNotificationRequest.builder()
-                .title("Issue Assigned")
-                .message("You have been assigned an issue")
-                .notificationType(NotificationType.ISSUE_ASSIGNED)
-                .resourceType(ResourceType.ISSUE)
-                .workspaceId(issueAssignedEvent.workspaceId())
-                .projectId(issueAssignedEvent.projectId())
-                .resourceId(issueAssignedEvent.issueId())
-                .recipients(List.of(assignee))
-                .build();
-        notificationService.createNotification(request);
-    }
 
     @Async("devSyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
