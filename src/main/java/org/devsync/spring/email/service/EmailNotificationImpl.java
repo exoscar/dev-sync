@@ -75,7 +75,16 @@ public class EmailNotificationImpl implements EmailNotificationService {
             mailSender.send(message);
             log.info("Email sent successfully. Subject={}", subject);
         } catch (MailException | MessagingException ex) {
-            log.error("Failed to send email. Subject={}", subject, ex);
+            log.error(
+                    "Failed to send email. Subject={}",
+                    subject,
+                    ex
+            );
+
+            throw new IllegalStateException(
+                    "Failed to send email",
+                    ex
+            );
         }
     }
 
