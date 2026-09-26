@@ -9,10 +9,10 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 @RequiredArgsConstructor
 public class WorkspaceMembershipCacheListener {
-private final WorkspaceMembershipCache workspaceMembershipCache;
+    private final WorkspaceMembershipCache workspaceMembershipCache;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleMembershipChange(WorkspaceMembershipChangedEvent event){
-        workspaceMembershipCache.evict(event.workspaceId(),event.userId());
+    public void handleMembershipChange(WorkspaceMembershipChangedEvent event) {
+        workspaceMembershipCache.evict(event.workspaceId(), event.userId());
     }
 }

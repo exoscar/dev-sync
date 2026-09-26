@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface LabelRepository extends JpaRepository<Label,UUID> {
+public interface LabelRepository extends JpaRepository<Label, UUID> {
 
     boolean existsByWorkspaceIdAndNormalizedName(UUID workspaceId, String normalizedName);
 

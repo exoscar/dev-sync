@@ -11,6 +11,8 @@ import java.lang.annotation.*;
 @Documented
 public @interface ValidPassword {
     String message() default "Password must contain uppercase, lowercase, number, and special character";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

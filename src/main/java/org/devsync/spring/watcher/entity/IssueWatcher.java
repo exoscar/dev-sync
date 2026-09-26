@@ -18,17 +18,17 @@ import java.util.UUID;
         })
 })
 public class IssueWatcher extends BaseEntity {
-        @Id
-        @GeneratedValue(strategy = GenerationType.UUID)
-        private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        private Issue issue;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Issue issue;
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
 
-        @Enumerated(EnumType.STRING)
-        private WatcherSource source;
+    @Enumerated(EnumType.STRING)
+    private WatcherSource source;
 
 }

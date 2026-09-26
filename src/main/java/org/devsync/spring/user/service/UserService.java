@@ -28,29 +28,29 @@ public class UserService {
     private final RoleRepository roleRepository;
 
 
-    public Page<UserResponse> getAllUsers(int page,int size) {
-        Pageable pageable = PageRequest.of(page,size, Sort.by("id"));
+    public Page<UserResponse> getAllUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
         Page<User> users = userRepository.findAll(pageable);
-       return users.map(this::mapToResponse);
+        return users.map(this::mapToResponse);
     }
 
     @Transactional
     public UserResponse updateRole(String id, @Valid UpdateRoleRequest request) {
-        UUID userId = Utils.parseUuid(id,"Invalid User Id");
+        UUID userId = Utils.parseUuid(id, "Invalid User Id");
         User user = getUserById(userId);
         Role role = roleRepository.findByRole(request.getRole()).orElseThrow(
-                ()-> new BusinessException("Role Not Found", ErrorCode.NOT_FOUND)
+                () -> new BusinessException("Role Not Found", ErrorCode.NOT_FOUND)
         );
         user.setRole(role);
         return mapToResponse(user);
     }
 
     public UserResponse getUserById(String id) {
-        UUID userId = Utils.parseUuid(id,"Invalid User Id");
+        UUID userId = Utils.parseUuid(id, "Invalid User Id");
         return mapToResponse(getUserById(userId));
     }
 
-    private UserResponse mapToResponse(User user){
+    private UserResponse mapToResponse(User user) {
         return UserResponse.builder()
                 .id(user.getId())
                 .firstName(user.getFirstName())
@@ -69,8 +69,6 @@ public class UserService {
                         )
                 );
     }
-
-
 
 
 }

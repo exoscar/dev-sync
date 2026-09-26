@@ -16,7 +16,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Slf4j
 public class AsyncConfig implements AsyncConfigurer {
     @Bean(name = "devSyncTaskExecutor")
-    public Executor devsyncExecutor(){
+    public Executor devsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setMaxPoolSize(8);
         executor.setCorePoolSize(4);

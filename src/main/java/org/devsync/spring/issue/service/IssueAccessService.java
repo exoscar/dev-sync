@@ -72,7 +72,6 @@ public class IssueAccessService {
     }
 
 
-
     public Issue getIssue(
             UUID projectId,
             UUID issueId
@@ -89,7 +88,7 @@ public class IssueAccessService {
                         ));
     }
 
-    public Issue getIssue(UUID issueId){
+    public Issue getIssue(UUID issueId) {
         return issueRepository.findById(issueId).orElseThrow(
                 () -> new BusinessException("Issue not found", ErrorCode.NOT_FOUND)
         );

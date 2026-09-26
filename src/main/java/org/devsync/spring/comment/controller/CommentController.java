@@ -24,32 +24,32 @@ public class CommentController {
     @Operation(summary = "Create Comment")
     @PostMapping("/issues/{issueId}/comments")
     public ApiResponse<CommentResponse> createComment(@PathVariable String issueId,
-                                                      @Valid @RequestBody CreateCommentRequest request){
-        CommentResponse response = commentService.createComment(issueId,request);
-        return ApiResponseUtil.success(response,"Comment creation successful");
+                                                      @Valid @RequestBody CreateCommentRequest request) {
+        CommentResponse response = commentService.createComment(issueId, request);
+        return ApiResponseUtil.success(response, "Comment creation successful");
     }
 
     @Operation(summary = "Get Issue Comments")
     @GetMapping("/issues/{issueId}/comments")
     public ApiResponse<Page<CommentResponse>> getComments(@PathVariable String issueId,
-                                                          @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE+"") int page,
-                                                          @RequestParam(defaultValue = AppConstants.DEFAULT_SIZE+"") int size
-    ){
-        Page<CommentResponse> responses = commentService.getComments(issueId,page,size);
+                                                          @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE + "") int page,
+                                                          @RequestParam(defaultValue = AppConstants.DEFAULT_SIZE + "") int size
+    ) {
+        Page<CommentResponse> responses = commentService.getComments(issueId, page, size);
         return ApiResponseUtil.success(responses);
     }
 
     @Operation(summary = "Edit Comment")
     @PutMapping("/comments/{commentId}")
     public ApiResponse<CommentResponse> editComment(@PathVariable String commentId,
-                                                    @Valid @RequestBody UpdateCommentRequest updateCommentRequest){
-        CommentResponse response = commentService.updateComment(commentId,updateCommentRequest);
-        return ApiResponseUtil.success(response,"Comment Update successful");
+                                                    @Valid @RequestBody UpdateCommentRequest updateCommentRequest) {
+        CommentResponse response = commentService.updateComment(commentId, updateCommentRequest);
+        return ApiResponseUtil.success(response, "Comment Update successful");
     }
 
     @Operation(summary = "Delete Comment")
     @DeleteMapping("/comments/{commentId}")
-    public ApiResponse<Void> deleteComments(@PathVariable String commentId){
+    public ApiResponse<Void> deleteComments(@PathVariable String commentId) {
         commentService.deleteComment(commentId);
         return ApiResponseUtil.success("Comment deletion successful");
     }

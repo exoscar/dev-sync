@@ -57,20 +57,20 @@ public class DashboardQueryService {
         return issueRepository.countByProjectIdAndAssigneeIsNull(projectId);
     }
 
-    public Map<UUID,Long> getMemberAssignedIssueStats(UUID workspaceId){
+    public Map<UUID, Long> getMemberAssignedIssueStats(UUID workspaceId) {
         List<MemberIssueStatsProjection> stats = issueRepository.getAssignedIssueCounts(workspaceId);
-        HashMap<UUID,Long> map = new HashMap<>();
-        for(MemberIssueStatsProjection stat:stats){
-            map.put(stat.getUserId(),stat.getCount());
+        HashMap<UUID, Long> map = new HashMap<>();
+        for (MemberIssueStatsProjection stat : stats) {
+            map.put(stat.getUserId(), stat.getCount());
         }
         return map;
     }
 
-    public Map<UUID,Long> getCompletedIssueCounts(UUID workspaceId){
+    public Map<UUID, Long> getCompletedIssueCounts(UUID workspaceId) {
         List<MemberIssueStatsProjection> statsProjections = issueRepository.getCompletedIssueCounts(workspaceId);
-        HashMap<UUID,Long> map = new HashMap<>();
-        for(MemberIssueStatsProjection stat: statsProjections){
-            map.put(stat.getUserId(),stat.getCount());
+        HashMap<UUID, Long> map = new HashMap<>();
+        for (MemberIssueStatsProjection stat : statsProjections) {
+            map.put(stat.getUserId(), stat.getCount());
         }
         return map;
     }

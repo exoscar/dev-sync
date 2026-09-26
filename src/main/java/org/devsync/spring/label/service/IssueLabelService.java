@@ -2,6 +2,7 @@ package org.devsync.spring.label.service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.devsync.spring.infrastructure.outbox.service.OutboxService;
 import org.devsync.spring.issue.entity.Issue;
 import org.devsync.spring.issue.service.IssueAccessService;
 import org.devsync.spring.issue.service.IssueValidationService;
@@ -34,6 +35,7 @@ public class IssueLabelService {
     private final WorkspaceAccessService workspaceAccessService;
     private final IssueLabelRepository issueLabelRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final OutboxService outboxService;
 
     @Transactional
     public IssueLabelResponse addLabel(String issueId, @Valid AddIssueLabelRequest request) {
@@ -42,16 +44,16 @@ public class IssueLabelService {
         Issue issue = issueAccessService.getIssue(issueUUID);
         WorkspaceMember member = workspaceAccessService.getCurrentWorkspaceMember(issue.getProject().getWorkspace().getId());
 
-        Label label = labelAccessService.getLabel(member.getWorkspace().getId(),labelUUID);
+        Label label = labelAccessService.getLabel(member.getWorkspace().getId(), labelUUID);
         issueLabelValidationService.validateManageIssueLabelsPermission(member);
         issueLabelValidationService.validateLabelAssignable(label);
-        issueLabelValidationService.validateLabelNotAlreadyAssigned(issue,label);
+        issueLabelValidationService.validateLabelNotAlreadyAssigned(issue, label);
         IssueLabel issueLabel = new IssueLabel();
         issueLabel.setIssue(issue);
         issueLabel.setLabel(label);
         issueLabel.setCreatedBy(member.getUser());
         issueLabelRepository.save(issueLabel);
-        eventPublisher.publishEvent( new LabelAddedEvent(
+        LabelAddedEvent event = new LabelAddedEvent(
                 issueUUID,
                 labelUUID,
                 member.getUser().getId(),
@@ -59,8 +61,10 @@ public class IssueLabelService {
                 issue.getProject().getId(),
                 label.getName(),
                 issue.getTitle()
-                )
         );
+        eventPublisher.publishEvent(event
+        );
+        outboxService.save("ISSUE", issue.getId(), "LABEL_ADDED", event);
         return mapper.toResponse(issueLabel);
 
     }
@@ -71,17 +75,19 @@ public class IssueLabelService {
         UUID labelUUID = labelValidationService.parseLabelId(labelId);
         Issue issue = issueAccessService.getIssue(issueUUID);
         WorkspaceMember member = workspaceAccessService.getCurrentWorkspaceMember(issue.getProject().getWorkspace().getId());
-        Label label = labelAccessService.getLabel(member.getWorkspace().getId(),labelUUID);
+        Label label = labelAccessService.getLabel(member.getWorkspace().getId(), labelUUID);
         issueLabelValidationService.validateManageIssueLabelsPermission(member);
-        issueLabelRepository.deleteByIssueIdAndLabelId(issueUUID,labelUUID);
-        eventPublisher.publishEvent(new LabelRemovedEvent(
-                issueUUID,labelUUID,
+        issueLabelRepository.deleteByIssueIdAndLabelId(issueUUID, labelUUID);
+        LabelRemovedEvent event = new LabelRemovedEvent(
+                issueUUID, labelUUID,
                 member.getUser().getId(),
                 issue.getProject().getWorkspace().getId(),
                 issue.getProject().getId(),
                 label.getName(),
                 issue.getTitle()
-        ));
+        );
+        eventPublisher.publishEvent(event);
+        outboxService.save("ISSUE", issue.getId(), "LABEL_REMOVED", event);
     }
 
     @Transactional(readOnly = true)

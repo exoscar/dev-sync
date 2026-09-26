@@ -18,22 +18,23 @@ public class AttachmentValidationService {
                     "text/plain",
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             );
+
     public void validate(MultipartFile file) {
-        if(file.isEmpty()){
+        if (file.isEmpty()) {
             throw new BusinessException(
                     "Invalid file",
                     ErrorCode.BAD_REQUEST
             );
         }
-        if(file.getSize() > MAX_FILE_SIZE){
+        if (file.getSize() > MAX_FILE_SIZE) {
             throw new BusinessException(
                     "File size should be less than 10 MB",
                     ErrorCode.BAD_REQUEST
             );
         }
         String contentType = file.getContentType();
-        if(contentType == null ||
-                !ALLOWED_TYPES.contains(contentType)){
+        if (contentType == null ||
+                !ALLOWED_TYPES.contains(contentType)) {
             throw new BusinessException(
                     "Invalid content type",
                     ErrorCode.BAD_REQUEST

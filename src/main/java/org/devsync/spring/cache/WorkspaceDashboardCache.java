@@ -13,14 +13,13 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class WorkspaceDashboardCache {
-    private final RedisService redisService;
-
     private final static Duration TTL = Duration.ofMinutes(2);
+    private final RedisService redisService;
 
     public void put(
             UUID workspaceId,
             WorkspaceDashboardResponse workspaceDashboardResponse
-    ){
+    ) {
         redisService.set(
                 RedisKey.workspaceDashboard(
                         workspaceId
@@ -32,14 +31,14 @@ public class WorkspaceDashboardCache {
 
     public Optional<WorkspaceDashboardResponse> get(
             UUID workspaceId
-    ){
-      return   redisService.get(
+    ) {
+        return redisService.get(
                 RedisKey.workspaceDashboard(workspaceId),
                 WorkspaceDashboardResponse.class
         );
     }
 
-    public void evict(UUID workspaceId){
+    public void evict(UUID workspaceId) {
         redisService.delete(RedisKey.workspaceDashboard(workspaceId));
     }
 

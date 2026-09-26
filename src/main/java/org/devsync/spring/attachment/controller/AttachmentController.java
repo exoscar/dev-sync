@@ -27,10 +27,10 @@ public class AttachmentController {
     @PostMapping
     public ApiResponse<AttachmentResponse> uploadFile(@PathVariable String projectId,
                                                       @PathVariable String issueId,
-                                                      @RequestParam("file")MultipartFile file
-    ){
-    AttachmentResponse response = attachmentService.uploadFile(projectId,issueId,file);
-    return ApiResponseUtil.success(response);
+                                                      @RequestParam("file") MultipartFile file
+    ) {
+        AttachmentResponse response = attachmentService.uploadFile(projectId, issueId, file);
+        return ApiResponseUtil.success(response);
     }
 
     @Operation(summary = "Attachment list")
@@ -39,8 +39,8 @@ public class AttachmentController {
     getAttachments(
             @PathVariable String projectId,
             @PathVariable String issueId
-    ){
-        List<AttachmentResponse> responses = attachmentService.getAttachments(projectId,issueId);
+    ) {
+        List<AttachmentResponse> responses = attachmentService.getAttachments(projectId, issueId);
         return ApiResponseUtil.success(responses);
     }
 
@@ -51,8 +51,8 @@ public class AttachmentController {
             @PathVariable String projectId,
             @PathVariable String issueId,
             @PathVariable String attachmentId
-    ){
-        AttachmentDownloadResponse response = attachmentService.getAttachmentResource(projectId,issueId,attachmentId);
+    ) {
+        AttachmentDownloadResponse response = attachmentService.getAttachmentResource(projectId, issueId, attachmentId);
         return ApiResponseUtil.download(response.getResource(), response.getOriginalFilename(), response.getContentType());
     }
 
@@ -63,10 +63,10 @@ public class AttachmentController {
             @PathVariable String projectId,
             @PathVariable String issueId,
             @PathVariable String attachmentId
-    ){
-         attachmentService.deleteAttachment(projectId,issueId,attachmentId);
-     return ApiResponseUtil.success("Attachment deleted successfully");
-       }
+    ) {
+        attachmentService.deleteAttachment(projectId, issueId, attachmentId);
+        return ApiResponseUtil.success("Attachment deleted successfully");
+    }
 
 
 }

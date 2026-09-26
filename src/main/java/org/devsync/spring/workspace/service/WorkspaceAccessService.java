@@ -5,13 +5,11 @@ import org.devsync.spring.cache.WorkspaceMembershipCache;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
 import org.devsync.spring.common.security.CurrentUserService;
-import org.devsync.spring.infrastructure.redis.RedisService;
 import org.devsync.spring.workspace.dto.WorkspaceMembershipCacheEntry;
 import org.devsync.spring.workspace.entity.Workspace;
 import org.devsync.spring.workspace.entity.WorkspaceMember;
 import org.devsync.spring.workspace.repository.WorkspaceMemberRepository;
 import org.devsync.spring.workspace.repository.WorkspaceRepository;
-import org.hibernate.jdbc.Work;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -34,9 +32,9 @@ public class WorkspaceAccessService {
     public Workspace getWorkspaceWithMembershipCheck(UUID workspaceId) {
         UUID currentUser = currentUserService.getCurrentUserId();
         Optional<WorkspaceMembershipCacheEntry> entry = workspaceMembershipCache.get(workspaceId, currentUser);
-        if(entry.isEmpty()){
+        if (entry.isEmpty()) {
             WorkspaceMember member =
-                   getWorkspaceMember(workspaceId,currentUser);
+                    getWorkspaceMember(workspaceId, currentUser);
             workspaceMembershipCache.put(
                     workspaceId,
                     currentUser,

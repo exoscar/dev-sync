@@ -7,7 +7,6 @@ import org.devsync.spring.cache.ProjectDashboardCache;
 import org.devsync.spring.cache.WorkspaceDashboardCache;
 import org.devsync.spring.dashboard.dto.*;
 import org.devsync.spring.dashboard.mapper.DashboardMapper;
-import org.devsync.spring.infrastructure.redis.RedisService;
 import org.devsync.spring.issue.projection.IssuePriorityCountProjection;
 import org.devsync.spring.issue.projection.IssueStatusCountProjection;
 import org.devsync.spring.project.service.ProjectAccessService;
@@ -36,7 +35,7 @@ public class DashboardService {
         UUID workspaceUUID = workspaceValidationService.parseWorkspaceId(workspaceId);
         workspaceAccessService.getWorkspaceWithMembershipCheck(workspaceUUID);
         Optional<WorkspaceDashboardResponse> response = workspaceDashboardCache.get(workspaceUUID);
-        if(response.isEmpty()){
+        if (response.isEmpty()) {
             long totalProjects = dashboardQueryService.countProjects(workspaceUUID);
             long totalMembers = dashboardQueryService.countMembers(workspaceUUID);
             long totalIssues = dashboardQueryService.countIssuesByWorkspaceId(workspaceUUID);
@@ -50,7 +49,7 @@ public class DashboardService {
                     .inProgressIssues(statusSummary.getInProgress())
                     .doneIssues(statusSummary.getDone())
                     .build());
-            workspaceDashboardCache.put(workspaceUUID,response.get());
+            workspaceDashboardCache.put(workspaceUUID, response.get());
         }
 
         return response.get();
@@ -60,31 +59,31 @@ public class DashboardService {
         UUID projectUUID = projectValidationService.parseProjectId(projectId);
         projectAccessService.getProjectWithMembershipCheck(projectUUID);
         Optional<ProjectStatsResponse> response = projectDashboardCache.get(projectUUID);
-        if(response.isEmpty()){
+        if (response.isEmpty()) {
 
 
-        List<IssueStatusCountProjection> statusCounts = dashboardQueryService.getIssueStatusCountsByProjectId(projectUUID);
-        long totalIssues = dashboardQueryService.countIssuesByProjectId(projectUUID);
-        StatusSummary statusSummary = dashboardMapper.toStatusSummary(statusCounts);
+            List<IssueStatusCountProjection> statusCounts = dashboardQueryService.getIssueStatusCountsByProjectId(projectUUID);
+            long totalIssues = dashboardQueryService.countIssuesByProjectId(projectUUID);
+            StatusSummary statusSummary = dashboardMapper.toStatusSummary(statusCounts);
 
-        List<IssuePriorityCountProjection> priorityCounts = dashboardQueryService.getIssuePriorityCounts(projectUUID);
-        PrioritySummary prioritySummary = dashboardMapper.toPrioritySummary(priorityCounts);
-        long assignedIssues = dashboardQueryService.countAssignedIssues(projectUUID);
-        long unassignedIssues = dashboardQueryService.countUnassignedIssues(projectUUID);
-          response = Optional.of(
-                  ProjectStatsResponse.builder()
-                          .totalIssues(totalIssues)
-                          .todoIssues(statusSummary.getTodo())
-                          .inProgressIssues(statusSummary.getInProgress())
-                          .doneIssues(statusSummary.getDone())
-                          .lowPriority(prioritySummary.getLow())
-                          .mediumPriority(prioritySummary.getMedium())
-                          .highPriority(prioritySummary.getHigh())
-                          .criticalPriority(prioritySummary.getCritical())
-                          .assignedIssues(assignedIssues)
-                          .unassignedIssues(unassignedIssues).build()
-          ) ;
-          projectDashboardCache.put(projectUUID,response.get());
+            List<IssuePriorityCountProjection> priorityCounts = dashboardQueryService.getIssuePriorityCounts(projectUUID);
+            PrioritySummary prioritySummary = dashboardMapper.toPrioritySummary(priorityCounts);
+            long assignedIssues = dashboardQueryService.countAssignedIssues(projectUUID);
+            long unassignedIssues = dashboardQueryService.countUnassignedIssues(projectUUID);
+            response = Optional.of(
+                    ProjectStatsResponse.builder()
+                            .totalIssues(totalIssues)
+                            .todoIssues(statusSummary.getTodo())
+                            .inProgressIssues(statusSummary.getInProgress())
+                            .doneIssues(statusSummary.getDone())
+                            .lowPriority(prioritySummary.getLow())
+                            .mediumPriority(prioritySummary.getMedium())
+                            .highPriority(prioritySummary.getHigh())
+                            .criticalPriority(prioritySummary.getCritical())
+                            .assignedIssues(assignedIssues)
+                            .unassignedIssues(unassignedIssues).build()
+            );
+            projectDashboardCache.put(projectUUID, response.get());
         }
         return response.get();
     }
@@ -97,15 +96,15 @@ public class DashboardService {
 
         Optional<List<MemberStatisticsResponse>> cached =
                 memberStatisticsCache.get(workspaceUUID);
-        if(cached.isEmpty()){
-        List<WorkspaceMember> members = workspaceAccessService.getWorkspaceMembers(workspaceUUID);
-            Map<UUID,Long> memberAssignedStats = dashboardQueryService.getMemberAssignedIssueStats(workspaceUUID);
-            Map<UUID,Long> memberDoneStats = dashboardQueryService.getCompletedIssueCounts(workspaceUUID);
+        if (cached.isEmpty()) {
+            List<WorkspaceMember> members = workspaceAccessService.getWorkspaceMembers(workspaceUUID);
+            Map<UUID, Long> memberAssignedStats = dashboardQueryService.getMemberAssignedIssueStats(workspaceUUID);
+            Map<UUID, Long> memberDoneStats = dashboardQueryService.getCompletedIssueCounts(workspaceUUID);
             List<MemberStatisticsResponse> stats = new ArrayList<>();
-            for (WorkspaceMember member : members){
+            for (WorkspaceMember member : members) {
                 User user = member.getUser();
-                long assignedIssues =memberAssignedStats.getOrDefault(user.getId(),0L);
-                long completedIssues =memberDoneStats.getOrDefault(user.getId(),0L);
+                long assignedIssues = memberAssignedStats.getOrDefault(user.getId(), 0L);
+                long completedIssues = memberDoneStats.getOrDefault(user.getId(), 0L);
                 double completionRate =
                         assignedIssues == 0
                                 ? 0
@@ -122,7 +121,7 @@ public class DashboardService {
                         .build();
                 stats.add(entry);
             }
-            memberStatisticsCache.put(workspaceUUID,stats);
+            memberStatisticsCache.put(workspaceUUID, stats);
 
             return stats;
         }

@@ -46,15 +46,15 @@ public class LabelController {
     @PutMapping("/{labelId}")
     public ApiResponse<LabelResponse> updateLabel(@PathVariable String workspaceId, @PathVariable String labelId,
                                                   @Valid @RequestBody UpdateLabelRequest request
-                                                  ){
-        LabelResponse response = labelService.updateLabel(workspaceId,labelId,request);
+    ) {
+        LabelResponse response = labelService.updateLabel(workspaceId, labelId, request);
         return ApiResponseUtil.success(response);
     }
 
     @Operation(summary = "Delete Label")
     @DeleteMapping("/{labelId}")
-    public ApiResponse<Void> deleteLabel(@PathVariable String workspaceId,@PathVariable String labelId){
-        labelService.archiveLabel(workspaceId,labelId);
+    public ApiResponse<Void> deleteLabel(@PathVariable String workspaceId, @PathVariable String labelId) {
+        labelService.archiveLabel(workspaceId, labelId);
         return ApiResponseUtil.success("Label deletion successful");
     }
 

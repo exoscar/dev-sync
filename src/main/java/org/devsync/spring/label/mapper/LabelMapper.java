@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LabelMapper {
-    public LabelResponse toResponse(Label label){
+    public LabelResponse toResponse(Label label) {
         return LabelResponse.builder()
                 .id(label.getId())
                 .name(label.getName())

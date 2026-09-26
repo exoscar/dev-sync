@@ -2,7 +2,6 @@ package org.devsync.spring.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +28,7 @@ public class RegisterRequest {
     private String role;
 
     @NotBlank
-    @Size(min = 8,max = 20,message = "Password must be 8-20 characters")
+    @Size(min = 8, max = 20, message = "Password must be 8-20 characters")
     @ValidPassword
     private String password;
 }

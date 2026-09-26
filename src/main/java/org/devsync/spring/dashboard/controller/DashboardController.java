@@ -39,7 +39,7 @@ public class DashboardController {
 
     @Operation(summary = "Get Member Stats")
     @GetMapping("/workspaces/{workspaceId}/member-statistics")
-    public ApiResponse< List<MemberStatisticsResponse>> getMemberStatistics(@PathVariable String workspaceId){
+    public ApiResponse<List<MemberStatisticsResponse>> getMemberStatistics(@PathVariable String workspaceId) {
         List<MemberStatisticsResponse> statisticsResponse = dashboardService.getMemberStatistics(workspaceId);
         return ApiResponseUtil.success(statisticsResponse);
     }

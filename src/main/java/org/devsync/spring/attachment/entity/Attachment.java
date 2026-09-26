@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.common.entity.BaseEntity;
 import org.devsync.spring.issue.entity.Issue;
-import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
@@ -27,11 +26,11 @@ public class Attachment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY,optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false)
     private Issue issue;
 
-    @ManyToOne(fetch = FetchType.LAZY,optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false)
     private User uploadedBy;
 

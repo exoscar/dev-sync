@@ -68,7 +68,7 @@ public class WorkspaceService {
     }
 
     public WorkspaceResponse getWorkspaceById(String id) {
-        Workspace workspace =  workspaceAccessService.getWorkspaceWithMembershipCheck(id);
+        Workspace workspace = workspaceAccessService.getWorkspaceWithMembershipCheck(id);
         return mapToWorkspace(workspace);
     }
 
@@ -117,7 +117,6 @@ public class WorkspaceService {
     }
 
 
-
     @Transactional
     public MemberResponse updateMemberRole(String id, @Valid UpdateRoleRequest request) {
         UUID workspaceId = validationService.parseWorkspaceId(id);
@@ -127,7 +126,7 @@ public class WorkspaceService {
         if (request.getRole() == WorkspaceRole.OWNER) {
             throw new BusinessException("Owner role cannot be assigned", ErrorCode.BAD_REQUEST);
         }
-        WorkspaceMember tarMember = workspaceAccessService.getWorkspaceMember(workspaceId,request.getId());
+        WorkspaceMember tarMember = workspaceAccessService.getWorkspaceMember(workspaceId, request.getId());
         WorkspaceMember currMember = workspaceAccessService.getCurrentWorkspaceMember(workspaceId);
         if (tarMember.getUser().getId().equals(currUser)) {
             throw new BusinessException("You cannot modify your own role", ErrorCode.FORBIDDEN);
@@ -156,7 +155,7 @@ public class WorkspaceService {
         UUID workspaceId = validationService.parseWorkspaceId(id);
         UUID currUser = currentUserService.getCurrentUserId();
         workspaceAccessService.getWorkspaceById(workspaceId);
-        WorkspaceMember tarMember = workspaceAccessService.getWorkspaceMember(workspaceId,request.getId());
+        WorkspaceMember tarMember = workspaceAccessService.getWorkspaceMember(workspaceId, request.getId());
         WorkspaceMember currMember = workspaceAccessService.getCurrentWorkspaceMember(workspaceId);
         if (tarMember.getRole() == WorkspaceRole.OWNER) {
             throw new BusinessException(

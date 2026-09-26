@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
-import org.devsync.spring.email.dto.EmailRecipient;
 import org.devsync.spring.issue.entity.Issue;
 import org.devsync.spring.issue.service.IssueAccessService;
 import org.devsync.spring.issue.service.IssueValidationService;
@@ -37,8 +36,8 @@ public class IssueWatcherService {
         UUID issueUUID = issueValidationService.parseIssueId(issueId);
         Issue issue = issueAccessService.getIssue(issueUUID);
         WorkspaceMember member = workspaceAccessService.getCurrentWorkspaceMember(issue.getProject().getWorkspace().getId());
-        if(issueWatcherRepository.existsByIssueIdAndUserId(issueUUID,member.getUser().getId())){
-           throw new BusinessException("Already Watching this issue", ErrorCode.WATCHER_ALREADY_EXISTS);
+        if (issueWatcherRepository.existsByIssueIdAndUserId(issueUUID, member.getUser().getId())) {
+            throw new BusinessException("Already Watching this issue", ErrorCode.WATCHER_ALREADY_EXISTS);
         }
         IssueWatcher watcher = new IssueWatcher();
         watcher.setIssue(issue);
@@ -49,10 +48,10 @@ public class IssueWatcherService {
     }
 
     @Transactional
-    public void addWatcher(Issue issue, User user, WatcherSource source){
+    public void addWatcher(Issue issue, User user, WatcherSource source) {
 
-        if(issueWatcherRepository.existsByIssueIdAndUserId(issue.getId(),user.getId())){
-          return;
+        if (issueWatcherRepository.existsByIssueIdAndUserId(issue.getId(), user.getId())) {
+            return;
         }
         IssueWatcher watcher = new IssueWatcher();
         watcher.setIssue(issue);
@@ -62,15 +61,15 @@ public class IssueWatcherService {
     }
 
     @Transactional
-    public void addCreatorWatcher(Issue issue,User currentUser){
-        addWatcher(issue, currentUser,WatcherSource.CREATOR);
+    public void addCreatorWatcher(Issue issue, User currentUser) {
+        addWatcher(issue, currentUser, WatcherSource.CREATOR);
     }
+
     @Transactional
-    public void addAssigneeWatcher(Issue issue,User assignee){
-        addWatcher(issue,assignee,WatcherSource.ASSIGNEE);
+    public void addAssigneeWatcher(Issue issue, User assignee) {
+        addWatcher(issue, assignee, WatcherSource.ASSIGNEE);
 
     }
-
 
 
     @Transactional
@@ -78,13 +77,14 @@ public class IssueWatcherService {
         UUID issueUUID = issueValidationService.parseIssueId(issueId);
         Issue issue = issueAccessService.getIssue(issueUUID);
         WorkspaceMember member = workspaceAccessService.getCurrentWorkspaceMember(issue.getProject().getWorkspace().getId());
-        IssueWatcher watcher = issueWatcherRepository.findByIssueIdAndUserId(issueUUID,member.getUser().getId()).orElseThrow(
-                ()-> new BusinessException("Not watching this issue", ErrorCode.NOT_FOUND)
+        IssueWatcher watcher = issueWatcherRepository.findByIssueIdAndUserId(issueUUID, member.getUser().getId()).orElseThrow(
+                () -> new BusinessException("Not watching this issue", ErrorCode.NOT_FOUND)
         );
         issueWatcherRepository.delete(watcher);
     }
+
     @Transactional(readOnly = true)
-    public List<WatcherResponse> getWatchers(String issueId){
+    public List<WatcherResponse> getWatchers(String issueId) {
         UUID issueUUID = issueValidationService.parseIssueId(issueId);
         Issue issue = issueAccessService.getIssue(issueUUID);
         workspaceAccessService.getWorkspaceWithMembershipCheck(issue.getProject().getWorkspace().getId());
@@ -93,11 +93,11 @@ public class IssueWatcherService {
     }
 
     @Transactional(readOnly = true)
-    public WatchStatusResponse isWatching(String issueId){
+    public WatchStatusResponse isWatching(String issueId) {
         UUID issueUUID = issueValidationService.parseIssueId(issueId);
         Issue issue = issueAccessService.getIssue(issueUUID);
         WorkspaceMember member = workspaceAccessService.getCurrentWorkspaceMember(issue.getProject().getWorkspace().getId());
-        boolean watching = issueWatcherRepository.existsByIssueIdAndUserId(issueUUID,member.getUser().getId());
+        boolean watching = issueWatcherRepository.existsByIssueIdAndUserId(issueUUID, member.getUser().getId());
         return WatchStatusResponse.builder().watching(watching).build();
     }
 

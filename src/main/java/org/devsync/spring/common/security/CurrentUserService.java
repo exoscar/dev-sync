@@ -12,7 +12,7 @@ import java.util.UUID;
 @Service
 public class CurrentUserService {
 
-    public CustomUserDetails getCurrentUser(){
+    public CustomUserDetails getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication.getPrincipal()
                 instanceof CustomUserDetails user)) {
@@ -24,6 +24,7 @@ public class CurrentUserService {
         }
         return user;
     }
+
     public String getCurrentToken() {
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
@@ -39,7 +40,7 @@ public class CurrentUserService {
         return token;
     }
 
-    public UUID getCurrentUserId(){
+    public UUID getCurrentUserId() {
         return getCurrentUser().getUserId();
     }
 
@@ -47,8 +48,8 @@ public class CurrentUserService {
         return getCurrentUser().getEmail();
     }
 
-    public CurrentUserResponse getCurrentUserResponse(){
+    public CurrentUserResponse getCurrentUserResponse() {
         CustomUserDetails cus = getCurrentUser();
-       return CurrentUserResponse.builder().email(cus.getEmail()).userId(cus.getUserId()).build();
+        return CurrentUserResponse.builder().email(cus.getEmail()).userId(cus.getUserId()).build();
     }
 }

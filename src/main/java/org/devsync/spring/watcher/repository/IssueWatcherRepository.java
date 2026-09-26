@@ -17,15 +17,15 @@ public interface IssueWatcherRepository extends JpaRepository<IssueWatcher, UUID
     List<IssueWatcher> findByIssueId(UUID issueId);
 
     @Query("""
-    select new org.devsync.spring.email.dto.EmailRecipient(
-        u.email,
-        u.firstName
-    )
-    from IssueWatcher iw
-    join iw.user u
-    where iw.issue.id = :issueId
-      and u.id <> :actorId
-""")
+                select new org.devsync.spring.email.dto.EmailRecipient(
+                    u.email,
+                    u.firstName
+                )
+                from IssueWatcher iw
+                join iw.user u
+                where iw.issue.id = :issueId
+                  and u.id <> :actorId
+            """)
     List<EmailRecipient> findWatcherEmailRecipients(
             UUID issueId,
             UUID actorId

@@ -9,4 +9,5 @@ public record UserSearchResult(
         UUID id,
         String fullName,
         String email
-) {}
+) {
+}

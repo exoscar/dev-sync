@@ -29,10 +29,10 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
     Page<Notification> findByProjectIdAndRecipientIdOrderByCreatedAtDesc(UUID projectId, UUID recipientId,
                                                                          Pageable pageable);
 
-    @Modifying(flushAutomatically = true,clearAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query(""" 
-        Update Notification n set n.isRead = true,n.readAt = :now
-        where n.recipient.id = :userId and n.isRead = false
-""")
-    int markAllRead(@Param("userId") UUID userId, @Param("now")Instant now);
+                    Update Notification n set n.isRead = true,n.readAt = :now
+                    where n.recipient.id = :userId and n.isRead = false
+            """)
+    int markAllRead(@Param("userId") UUID userId, @Param("now") Instant now);
 }

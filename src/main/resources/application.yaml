@@ -47,6 +47,19 @@ spring:
       port: 6379
       timeout: 2s
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: dev-sync
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "org.devsync.spring.infrastructure.kafka.event"
+      enable-auto-commit: false
 
 app:
   jwt:
@@ -54,3 +67,9 @@ app:
     expiration-ms: 90000000
   storage:
     upload-dir: uploads
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus

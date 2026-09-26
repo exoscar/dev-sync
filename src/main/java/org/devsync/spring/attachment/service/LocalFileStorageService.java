@@ -1,6 +1,5 @@
 package org.devsync.spring.attachment.service;
 
-import lombok.RequiredArgsConstructor;
 import org.devsync.spring.common.config.StorageProperties;
 import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
@@ -56,8 +55,8 @@ public class LocalFileStorageService implements FileStorageService {
         Path filePath = uploadPath.resolve(storedFilename).normalize();
         try {
             Resource resource = new UrlResource(filePath.toUri());
-            if(!resource.exists()||
-            !resource.isReadable()){
+            if (!resource.exists() ||
+                    !resource.isReadable()) {
                 throw new BusinessException(
                         "File not found",
                         ErrorCode.NOT_FOUND

@@ -15,8 +15,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class MemberStatisticsCache {
-    private final RedisService redisService;
     private final static Duration TTL = Duration.ofMinutes(2);
+    private final RedisService redisService;
 
     public void put(UUID workspaceId, List<MemberStatisticsResponse> statsResponse) {
         redisService.set(RedisKey.memberStatistics(workspaceId), statsResponse, TTL);

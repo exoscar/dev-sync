@@ -36,6 +36,6 @@ public class JwtBlacklistServiceImpl implements JwtBlacklistService {
 
     @Override
     public boolean isBlacklisted(String jti) {
-       return redisService.exists(RedisKey.jwtBlacklist(jti));
+        return redisService.exists(RedisKey.jwtBlacklist(jti));
     }
 }

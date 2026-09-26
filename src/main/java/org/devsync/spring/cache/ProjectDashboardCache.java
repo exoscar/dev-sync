@@ -13,16 +13,18 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ProjectDashboardCache {
-    private final RedisService redisService;
     private final static Duration TTL = Duration.ofMinutes(2);
+    private final RedisService redisService;
 
     public void put(UUID projectId, ProjectStatsResponse statsResponse) {
         redisService.set(RedisKey.projectDashboard(projectId), statsResponse, TTL);
     }
-    public Optional<ProjectStatsResponse> get(UUID projectId){
-      return redisService.get(RedisKey.projectDashboard(projectId), ProjectStatsResponse.class);
+
+    public Optional<ProjectStatsResponse> get(UUID projectId) {
+        return redisService.get(RedisKey.projectDashboard(projectId), ProjectStatsResponse.class);
     }
-    public void evict(UUID projectId){
+
+    public void evict(UUID projectId) {
         redisService.delete(RedisKey.projectDashboard(projectId));
     }
 }
