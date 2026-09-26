@@ -46,24 +46,24 @@ public class JwtFilter extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
                 response.getWriter().write("""
-                    {
-                      "success": false,
-                      "message": "Invalid or expired token"
-                    }
-                    """);
+                        {
+                          "success": false,
+                          "message": "Invalid or expired token"
+                        }
+                        """);
                 response.flushBuffer();
                 return;
             }
             String jti = jwtService.extractJti(token);
-            if(jwtBlacklistService.isBlacklisted(jti)){
+            if (jwtBlacklistService.isBlacklisted(jti)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
                 response.getWriter().write("""
-                    {
-                      "success": false,
-                     "message": "Token has been revoked"
-                    }
-                    """);
+                        {
+                          "success": false,
+                         "message": "Token has been revoked"
+                        }
+                        """);
                 response.flushBuffer();
                 return;
             }

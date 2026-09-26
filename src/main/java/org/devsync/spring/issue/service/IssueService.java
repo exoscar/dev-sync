@@ -32,7 +32,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -125,7 +124,7 @@ public class IssueService {
         IssueStatus oldStatus = issue.getStatus();
         issue.setStatus(request.getStatus());
         activityService.issueStatusChanged(issue, member.getUser(), oldStatus);
-        eventPublisher.publishEvent(new IssueStatusChangedEvent(
+        IssueStatusChangedEvent event = new IssueStatusChangedEvent(
                 issue.getId(),
                 issue.getTitle(),
                 issue.getDescription(),
@@ -136,13 +135,15 @@ public class IssueService {
                 issue.getProject().getWorkspace().getName(),
                 issue.getProject().getId(),
                 issue.getProject().getName()
-        ));
+        );
+        eventPublisher.publishEvent(event);
         eventPublisher.publishEvent(
                 new DashboardCacheInvalidationEvent(
                         issue.getProject().getWorkspace().getId(),
                         issue.getProject().getId()
                 )
         );
+        outboxService.save("ISSUE", issue.getId(), "ISSUE_STATUS_CHANGED", event);
         return mapper.toResponse(issue);
     }
 
@@ -216,7 +217,7 @@ public class IssueService {
         validationService.validatePriorityChange(issue, request.getIssuePriority());
         issue.setPriority(request.getIssuePriority());
         activityService.issuePriorityChanged(issue, member.getUser(), oldPriority);
-        eventPublisher.publishEvent(new IssuePriorityChangedEvent(
+        IssuePriorityChangedEvent event = new IssuePriorityChangedEvent(
                 issue.getId(),
                 issue.getTitle(),
                 issue.getDescription(),
@@ -227,13 +228,16 @@ public class IssueService {
                 issue.getProject().getWorkspace().getName(),
                 issue.getProject().getId(),
                 issue.getProject().getName()
-        ));
+        );
+        eventPublisher.publishEvent(event);
+
         eventPublisher.publishEvent(
                 new DashboardCacheInvalidationEvent(
                         issue.getProject().getWorkspace().getId(),
                         issue.getProject().getId()
                 )
         );
+        outboxService.save("ISSUE", issue.getId(), "ISSUE_PRIORITY_CHANGED", event);
         return mapper.toResponse(issue);
     }
 

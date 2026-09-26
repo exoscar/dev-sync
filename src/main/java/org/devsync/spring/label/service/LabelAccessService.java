@@ -25,18 +25,18 @@ public class LabelAccessService {
     public Label getLabel(String workspaceId, String labelId) {
         UUID labelUUID = validationService.parseLabelId(labelId);
         UUID workspaceUUID = workspaceValidationService.parseWorkspaceId(workspaceId);
-      return getLabel(workspaceUUID,labelUUID);
+        return getLabel(workspaceUUID, labelUUID);
     }
 
     public Label getLabel(UUID workspaceId, UUID labelId) {
 
         Workspace workspace = workspaceAccessService.getWorkspaceWithMembershipCheck(workspaceId);
-        return labelRepository.findByWorkspaceIdAndId(workspace.getId(),labelId).orElseThrow(
-                ()-> new BusinessException("Label not found", ErrorCode.NOT_FOUND)
+        return labelRepository.findByWorkspaceIdAndId(workspace.getId(), labelId).orElseThrow(
+                () -> new BusinessException("Label not found", ErrorCode.NOT_FOUND)
         );
     }
 
-    public WorkspaceMember validateManageLabelsPermission(UUID workspaceId){
+    public WorkspaceMember validateManageLabelsPermission(UUID workspaceId) {
         WorkspaceMember member = workspaceAccessService.getCurrentWorkspaceMember(workspaceId);
         if (!(member.getRole() == WorkspaceRole.MAINTAINER || member.getRole() == WorkspaceRole.OWNER)) {
             throw new BusinessException("Access denied:You can not perform this action", ErrorCode.FORBIDDEN);

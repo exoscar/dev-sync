@@ -11,11 +11,11 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
     @Bean
-    public RedisTemplate<String,Object> redisTemplate(
+    public RedisTemplate<String, Object> redisTemplate(
             RedisConnectionFactory connectionFactory,
             ObjectMapper objectMapper
-    ){
-        RedisTemplate<String,Object> template = new RedisTemplate<>();
+    ) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
 
         template.setConnectionFactory(connectionFactory);
 

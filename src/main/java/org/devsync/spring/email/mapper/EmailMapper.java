@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EmailMapper {
 
-    public EmailRecipient toEmailRecipient(User user){
+    public EmailRecipient toEmailRecipient(User user) {
         return EmailRecipient.builder().email(user.getEmail()).firstName(user.getFirstName()).build();
     }
 }

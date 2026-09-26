@@ -12,7 +12,6 @@ import org.devsync.spring.common.util.Utils;
 import org.devsync.spring.issue.context.IssueContext;
 import org.devsync.spring.issue.service.IssueAccessService;
 import org.devsync.spring.issue.service.IssueAuthorizationService;
-import org.jspecify.annotations.NonNull;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,16 +82,16 @@ public class AttachmentService {
         repository.delete(attachment);
     }
 
-    private UUID parseAttachmentId(String attachmentId){
-        return Utils.parseUuid(attachmentId,"Invalid Attachment Id");
+    private UUID parseAttachmentId(String attachmentId) {
+        return Utils.parseUuid(attachmentId, "Invalid Attachment Id");
     }
 
     private Attachment getAttachment(String attachmentId, IssueContext issueContext) {
         Attachment attachment = repository.findById(parseAttachmentId(attachmentId)).orElseThrow(
-                ()-> new BusinessException("File not found",ErrorCode.NOT_FOUND)
+                () -> new BusinessException("File not found", ErrorCode.NOT_FOUND)
         );
-        if(!attachment.getIssue().getId()
-                .equals(issueContext.issue().getId())){
+        if (!attachment.getIssue().getId()
+                .equals(issueContext.issue().getId())) {
             throw new BusinessException(
                     "Attachment not found",
                     ErrorCode.NOT_FOUND

@@ -58,14 +58,14 @@ public class NotificationController {
 
     @Operation(summary = "Read Notification")
     @PatchMapping("/{notificationId}/read")
-    public ApiResponse<Void> markRead(@PathVariable String notificationId){
+    public ApiResponse<Void> markRead(@PathVariable String notificationId) {
         notificationService.markRead(notificationId);
         return ApiResponseUtil.success("Read notification");
     }
 
     @Operation(summary = "Read All Notifications")
     @PatchMapping("/read-all")
-    public ApiResponse<Void> markAllRead(){
+    public ApiResponse<Void> markAllRead() {
         notificationService.markAllRead();
         return ApiResponseUtil.success("Read all notifications");
     }

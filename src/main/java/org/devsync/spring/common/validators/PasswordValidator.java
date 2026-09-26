@@ -3,7 +3,7 @@ package org.devsync.spring.common.validators;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class PasswordValidator implements ConstraintValidator<ValidPassword,String> {
+public class PasswordValidator implements ConstraintValidator<ValidPassword, String> {
 
     @Override
     public boolean isValid(String password,

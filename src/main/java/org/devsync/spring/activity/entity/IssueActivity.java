@@ -29,7 +29,7 @@ public class IssueActivity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ActivityType activityType;
 
-    @Column(nullable = false,length = 5000)
+    @Column(nullable = false, length = 5000)
     private String description;
 
 }

@@ -41,7 +41,7 @@ public class AuthService {
             throw new BusinessException("Email already Exists", ErrorCode.USER_EMAIL_ALREADY_EXISTS);
         }
         Role role = roleRepository.findByRole(request.getRole()).orElseThrow(
-                ()-> new BusinessException("Role Not Found", ErrorCode.NOT_FOUND)
+                () -> new BusinessException("Role Not Found", ErrorCode.NOT_FOUND)
         );
         String password = passwordEncoder.encode(request.getPassword());
 
@@ -66,17 +66,17 @@ public class AuthService {
     public LoginResponse loginUser(@Valid LoginRequest loginRequest) {
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
-        User user = userRepository.findByEmail(email).orElseThrow(()->
-             new BusinessException("Invalid email or password", ErrorCode.UNAUTHORIZED)
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+                new BusinessException("Invalid email or password", ErrorCode.UNAUTHORIZED)
         );
         if (!passwordEncoder.matches(password, user.getPassword())) {
             log.warn("Login failed: invalid password for userId={}", user.getId());
-           throw new BusinessException("Invalid email or password", ErrorCode.UNAUTHORIZED);
+            throw new BusinessException("Invalid email or password", ErrorCode.UNAUTHORIZED);
         }
 
         String token = jwtService.generateAccessToken(user.getId());
 
-        return  LoginResponse.builder().token(token).build();
+        return LoginResponse.builder().token(token).build();
 
     }
 

@@ -4,11 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.devsync.spring.infrastructure.kafka.KafkaEventProducer;
-import org.devsync.spring.infrastructure.kafka.event.IssueAssignedKafkaEvent;
+import org.devsync.spring.infrastructure.kafka.event.KafkaNotificationEvent;
+import org.devsync.spring.infrastructure.kafka.event.KafkaNotificationEventMapper;
 import org.devsync.spring.infrastructure.outbox.entity.OutboxEvent;
 import org.devsync.spring.infrastructure.outbox.repository.OutboxEventRepository;
-import org.devsync.spring.issue.event.IssueAssignedEvent;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,32 +23,16 @@ public class OutboxPublisher {
     private final OutboxEventRepository outboxEventRepository;
     private final KafkaEventProducer kafkaEventProducer;
     private final ObjectMapper objectMapper;
+    private final KafkaNotificationEventMapper mapper;
 
     @Transactional
-    public void publishPendingEvents(){
+    public void publishPendingEvents() {
         List<OutboxEvent> eventList = outboxEventRepository.findUnpublishedEventsForUpdate();
-        for(OutboxEvent event:eventList){
+        for (OutboxEvent event : eventList) {
             try {
+                KafkaNotificationEvent kafkaEvent =
+                        mapper.map(event);
 
-                IssueAssignedEvent domainEvent =
-                        objectMapper.readValue(
-                                event.getPayload(),
-                                IssueAssignedEvent.class
-                        );
-
-                IssueAssignedKafkaEvent kafkaEvent =
-                        new IssueAssignedKafkaEvent(
-                                event.getId(),                 // stable eventId
-                                domainEvent.issueId(),
-                                domainEvent.title(),
-                                domainEvent.description(),
-                                domainEvent.actorId(),
-                                domainEvent.assigneeId(),
-                                domainEvent.workspaceId(),
-                                domainEvent.workspaceName(),
-                                domainEvent.projectId(),
-                                domainEvent.projectName()
-                        );
                 kafkaEventProducer.sendAndWait(
                         ISSUE_EVENTS_TOPIC,
                         event.getAggregateId().toString(),
@@ -71,4 +54,6 @@ public class OutboxPublisher {
             }
         }
     }
+
+
 }

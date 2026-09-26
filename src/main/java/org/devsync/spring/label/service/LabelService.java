@@ -69,7 +69,7 @@ public class LabelService {
         String name = request.getName().trim();
         labelAccessService.validateManageLabelsPermission(workspaceUUID);
         String normalizedName = validationService.normalizeName(name);
-        validationService.validateLabelNameUniqueForUpdate(workspaceUUID, normalizedName,label.getId());
+        validationService.validateLabelNameUniqueForUpdate(workspaceUUID, normalizedName, label.getId());
 
         label.setNormalizedName(normalizedName);
         label.setColor(request.getColor().toUpperCase(Locale.ROOT));

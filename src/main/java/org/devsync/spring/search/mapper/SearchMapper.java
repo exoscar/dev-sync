@@ -13,7 +13,7 @@ import java.util.List;
 
 @Component
 public class SearchMapper {
-    public IssueSearchResult toIssueSearchResult(IssueSearchProjection issueSearchProjection){
+    public IssueSearchResult toIssueSearchResult(IssueSearchProjection issueSearchProjection) {
         return IssueSearchResult.builder()
                 .id(issueSearchProjection.getId())
                 .title(issueSearchProjection.getTitle())
@@ -23,22 +23,23 @@ public class SearchMapper {
                 .build();
     }
 
-    public ProjectSearchResult toProjectSearchResult(ProjectSearchProjection projectSearchProjection){
+    public ProjectSearchResult toProjectSearchResult(ProjectSearchProjection projectSearchProjection) {
         return ProjectSearchResult.builder()
                 .id(projectSearchProjection.getId())
                 .name(projectSearchProjection.getName())
                 .build();
     }
-    public UserSearchResult toUserSearchResult(UserSearchProjection userSearchProjection){
+
+    public UserSearchResult toUserSearchResult(UserSearchProjection userSearchProjection) {
         return UserSearchResult.builder()
                 .id(userSearchProjection.getId())
-                .fullName(userSearchProjection.getFirstName()+" "+ userSearchProjection.getLastName())
+                .fullName(userSearchProjection.getFirstName() + " " + userSearchProjection.getLastName())
                 .email(userSearchProjection.getEmail()).build();
     }
 
     public GlobalSearchResponse toResponse(List<IssueSearchResult> issueSearchResults,
                                            List<ProjectSearchResult> projectSearchResult,
-                                           List<UserSearchResult> userSearchResult){
+                                           List<UserSearchResult> userSearchResult) {
         return GlobalSearchResponse.builder()
                 .issues(issueSearchResults)
                 .projects(projectSearchResult)

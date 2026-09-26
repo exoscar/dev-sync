@@ -39,7 +39,7 @@ public class ProjectAccessService {
         return project;
     }
 
-    public Project getProjectWithMembershipCheck(String projectId){
+    public Project getProjectWithMembershipCheck(String projectId) {
         UUID projectUUID = projectValidationService.parseProjectId(projectId);
         return getProjectWithMembershipCheck(projectUUID);
     }

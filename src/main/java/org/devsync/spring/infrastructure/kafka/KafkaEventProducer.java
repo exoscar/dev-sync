@@ -34,6 +34,7 @@ public class KafkaEventProducer {
                     );
                 });
     }
+
     public void sendAndWait(
             String topic,
             String key,

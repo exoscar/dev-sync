@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class IssueLabelMapper {
     public IssueLabelResponse toResponse(IssueLabel issueLabel) {
-     return  IssueLabelResponse.builder()
-             .id(issueLabel.getId())
-             .labelId(issueLabel.getLabel().getId())
-             .name(issueLabel.getLabel().getName())
-             .color(issueLabel.getLabel().getColor())
-             .status(issueLabel.getLabel().getStatus())
-             .build();
+        return IssueLabelResponse.builder()
+                .id(issueLabel.getId())
+                .labelId(issueLabel.getLabel().getId())
+                .name(issueLabel.getLabel().getName())
+                .color(issueLabel.getLabel().getColor())
+                .status(issueLabel.getLabel().getStatus())
+                .build();
     }
 }

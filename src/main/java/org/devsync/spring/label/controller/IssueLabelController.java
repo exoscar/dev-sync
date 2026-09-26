@@ -23,22 +23,22 @@ public class IssueLabelController {
     @Operation(operationId = "Add Label to Issue")
     @PostMapping
     public ApiResponse<IssueLabelResponse> addLabel(@PathVariable String issueId,
-                                                    @Valid @RequestBody AddIssueLabelRequest request){
-        IssueLabelResponse response = issueLabelService.addLabel(issueId,request);
-        return ApiResponseUtil.success(response,"label assigned");
+                                                    @Valid @RequestBody AddIssueLabelRequest request) {
+        IssueLabelResponse response = issueLabelService.addLabel(issueId, request);
+        return ApiResponseUtil.success(response, "label assigned");
     }
 
     @Operation(summary = "Get Issue Labels")
     @GetMapping
-    public ApiResponse<List<IssueLabelResponse>> getLabels(@PathVariable String issueId){
+    public ApiResponse<List<IssueLabelResponse>> getLabels(@PathVariable String issueId) {
         List<IssueLabelResponse> responses = issueLabelService.getLabels(issueId);
         return ApiResponseUtil.success(responses);
     }
 
     @Operation(summary = "Delete Issue Label")
     @DeleteMapping("/{labelId}")
-    public ApiResponse<Void> removeLabel(@PathVariable String issueId,@PathVariable String labelId){
-        issueLabelService.removeLabel(issueId,labelId);
+    public ApiResponse<Void> removeLabel(@PathVariable String issueId, @PathVariable String labelId) {
+        issueLabelService.removeLabel(issueId, labelId);
         return ApiResponseUtil.success("label removed");
     }
 

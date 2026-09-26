@@ -17,8 +17,8 @@ public class SearchController {
     private final SearchService searchService;
 
     @GetMapping("/search")
-    public ApiResponse<GlobalSearchResponse> globalSearch(@PathVariable UUID workspaceId, @RequestParam String query){
-        GlobalSearchResponse response = searchService.search(workspaceId,query);
+    public ApiResponse<GlobalSearchResponse> globalSearch(@PathVariable UUID workspaceId, @RequestParam String query) {
+        GlobalSearchResponse response = searchService.search(workspaceId, query);
         return ApiResponseUtil.success(response);
     }
 }

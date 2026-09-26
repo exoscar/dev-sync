@@ -29,7 +29,7 @@ public class IssueActivityService {
     private final IssueAccessService issueAccessService;
 
     @Transactional
-    public void recordActivity(Issue issue, User user, ActivityType activityType, String description){
+    public void recordActivity(Issue issue, User user, ActivityType activityType, String description) {
         IssueActivity activity = new IssueActivity();
         activity.setIssue(issue);
         activity.setUser(user);
@@ -37,16 +37,17 @@ public class IssueActivityService {
         activity.setDescription(description);
         issueActivityRepository.save(activity);
     }
+
     public Page<IssueActivityResponse> getIssueActivities(String issueId, int page, int size) {
         IssueContext context = issueAccessService.loadIssueContext(issueId);
-        Pageable pageable = PageRequest.of(page,size, Sort.by(Sort.Direction.DESC,"createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<IssueActivity> issueActivities = issueActivityRepository.findByIssueId(context.issue().getId(), pageable);
         return issueActivities.map(activityMapper::mapToIssueActivityResponse);
     }
 
     public Page<ActivityFeedResponse> getWorkspaceActivityFeed(String workspaceId, int page, int size) {
         Workspace workspace = workspaceAccessService.getWorkspaceWithMembershipCheck(workspaceId);
-        Pageable pageable = PageRequest.of(page,size,Sort.by(Sort.Direction.DESC,"createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<IssueActivity> activities = issueActivityRepository.findAllByIssueProjectWorkspaceId(
                 workspace.getId(),
                 pageable

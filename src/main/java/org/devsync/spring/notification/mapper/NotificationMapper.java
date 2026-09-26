@@ -24,7 +24,7 @@ public class NotificationMapper {
                 .build();
     }
 
-    public UnreadCountResponse toRespone(long count){
+    public UnreadCountResponse toRespone(long count) {
         return UnreadCountResponse.builder().count(count).build();
     }
 }

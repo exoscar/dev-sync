@@ -17,7 +17,7 @@ public class Comment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false,length = 5000)
+    @Column(nullable = false, length = 5000)
     private String content;
 
     @ManyToOne(optional = false)

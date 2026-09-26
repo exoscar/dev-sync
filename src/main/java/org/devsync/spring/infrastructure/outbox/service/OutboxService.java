@@ -23,7 +23,7 @@ public class OutboxService {
             UUID aggregateId,
             String eventType,
             Object event
-    ){
+    ) {
         try {
             log.info(
                     "Saving outbox event: aggregateType={}, aggregateId={}, eventType={}",
@@ -37,11 +37,11 @@ public class OutboxService {
             OutboxEvent outboxEvent = new OutboxEvent(
                     UUID.randomUUID(),
                     aggregateType,
-                    aggregateId,eventType,payload
+                    aggregateId, eventType, payload
             );
 
             outboxEventRepository.save(outboxEvent);
-        }catch (JsonProcessingException e){
+        } catch (JsonProcessingException e) {
             throw new IllegalStateException("Failed to serialize outbox event");
         }
     }

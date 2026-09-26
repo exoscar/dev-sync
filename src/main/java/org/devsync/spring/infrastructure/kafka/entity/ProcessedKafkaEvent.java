@@ -4,7 +4,6 @@ package org.devsync.spring.infrastructure.kafka.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,13 +16,13 @@ import java.util.UUID;
 @Getter
 @Table(name = "processed_kafka_events")
 @NoArgsConstructor
-public class ProcessedKafkaEvent  {
+public class ProcessedKafkaEvent {
     @Id
     private UUID eventId;
 
     private Instant processedAt;
 
-    public ProcessedKafkaEvent(UUID eventId){
+    public ProcessedKafkaEvent(UUID eventId) {
         this.eventId = eventId;
         processedAt = Instant.now();
     }

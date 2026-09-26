@@ -12,9 +12,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UnreadNotificationCache {
-    private final RedisService redisService;
-
     private final static Duration TTL = Duration.ofMinutes(1);
+    private final RedisService redisService;
 
     public void put(UUID userId, Long unreadCnt) {
         redisService.set(RedisKey.unreadNotification(userId), unreadCnt, TTL);

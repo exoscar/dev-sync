@@ -28,9 +28,9 @@ public class IssueActivityController {
     )
     @GetMapping("/issues/{issueId}/activities")
     public ApiResponse<Page<IssueActivityResponse>> getIssueActivity(@PathVariable String issueId,
-                                                                     @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE+"") int page,
-                                                                     @RequestParam(defaultValue = AppConstants.DEFAULT_SIZE+"") int size){
-        Page<IssueActivityResponse> responses = issueActivityService.getIssueActivities(issueId,page,size);
+                                                                     @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE + "") int page,
+                                                                     @RequestParam(defaultValue = AppConstants.DEFAULT_SIZE + "") int size) {
+        Page<IssueActivityResponse> responses = issueActivityService.getIssueActivities(issueId, page, size);
         return ApiResponseUtil.success(responses);
     }
 
@@ -39,9 +39,9 @@ public class IssueActivityController {
     )
     @GetMapping("/workspaces/{workspaceId}/activity-feed")
     public ApiResponse<Page<ActivityFeedResponse>> getActivityFeed(@PathVariable String workspaceId,
-                                                                    @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE+"") int page,
-                                                                    @RequestParam(defaultValue = AppConstants.DEFAULT_SIZE+"") int size){
-        Page<ActivityFeedResponse> responses = issueActivityService.getWorkspaceActivityFeed(workspaceId,page,size);
+                                                                   @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE + "") int page,
+                                                                   @RequestParam(defaultValue = AppConstants.DEFAULT_SIZE + "") int size) {
+        Page<ActivityFeedResponse> responses = issueActivityService.getWorkspaceActivityFeed(workspaceId, page, size);
         return ApiResponseUtil.success(responses);
     }
 }

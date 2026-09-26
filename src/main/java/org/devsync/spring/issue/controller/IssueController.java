@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.devsync.spring.common.constants.AppConstants;
 import org.devsync.spring.common.response.ApiResponse;
 import org.devsync.spring.common.util.ApiResponseUtil;
-import org.devsync.spring.dashboard.dto.ProjectStatsResponse;
 import org.devsync.spring.issue.dto.*;
 import org.devsync.spring.issue.entity.IssuePriority;
 import org.devsync.spring.issue.entity.IssueStatus;

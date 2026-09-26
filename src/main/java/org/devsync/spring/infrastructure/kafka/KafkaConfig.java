@@ -5,14 +5,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.retry.annotation.CircuitBreaker;
 
 @Configuration
 @EnableKafka
 public class KafkaConfig {
 
     @Bean
-    public NewTopic testEventsTopic(){
+    public NewTopic testEventsTopic() {
         return TopicBuilder
                 .name("devsync.test-events")
                 .partitions(1)
@@ -21,7 +20,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public NewTopic issueEventTopic(){
+    public NewTopic issueEventTopic() {
         return TopicBuilder
                 .name("devsync.issue-events")
                 .partitions(3)

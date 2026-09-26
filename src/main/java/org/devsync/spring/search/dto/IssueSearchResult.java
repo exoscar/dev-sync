@@ -12,4 +12,5 @@ public record IssueSearchResult(
         IssueStatus status,
         UUID projectId,
         String projectName
-) {}
+) {
+}

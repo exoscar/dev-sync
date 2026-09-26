@@ -6,7 +6,7 @@ import org.devsync.spring.common.exception.ErrorCode;
 import java.util.UUID;
 
 public class Utils {
-    public  static UUID parseUuid(String id, String errorMessage) {
+    public static UUID parseUuid(String id, String errorMessage) {
         try {
             return UUID.fromString(id);
         } catch (IllegalArgumentException ex) {

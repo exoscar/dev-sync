@@ -11,7 +11,7 @@ public interface IssueLabelRepository extends JpaRepository<IssueLabel, UUID> {
             UUID issueId,
             UUID labelId
     );
-    
+
 
     void deleteByIssueIdAndLabelId(
             UUID issueId,

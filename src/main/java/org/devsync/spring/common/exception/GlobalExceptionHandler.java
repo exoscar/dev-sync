@@ -6,11 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -56,8 +54,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ApiError> handleBusinessException(BusinessException e){
-    return buildResponse(e.getMessage(),e.getErrorCode(),Collections.emptyList());
+    public ResponseEntity<ApiError> handleBusinessException(BusinessException e) {
+        return buildResponse(e.getMessage(), e.getErrorCode(), Collections.emptyList());
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
@@ -74,10 +72,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleInternalServerError(Exception e){
+    public ResponseEntity<ApiError> handleInternalServerError(Exception e) {
         log.error("Unexpected exception occurred", e);
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
-        return buildResponse("Something went wrong",errorCode,Collections.emptyList());
+        return buildResponse("Something went wrong", errorCode, Collections.emptyList());
     }
 
 

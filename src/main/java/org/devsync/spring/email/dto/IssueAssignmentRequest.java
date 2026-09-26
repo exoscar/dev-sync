@@ -2,7 +2,6 @@ package org.devsync.spring.email.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import org.devsync.spring.auth.entity.User;
 
 import java.util.List;
 

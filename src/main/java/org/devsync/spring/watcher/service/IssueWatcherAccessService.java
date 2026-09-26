@@ -8,7 +8,6 @@ import org.devsync.spring.issue.service.IssueValidationService;
 import org.devsync.spring.watcher.entity.IssueWatcher;
 import org.devsync.spring.watcher.repository.IssueWatcherRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,15 +20,15 @@ public class IssueWatcherAccessService {
     private final IssueAccessService issueAccessService;
     private final IssueWatcherRepository issueWatcherRepository;
 
-    public List<IssueWatcher> getIssueWatchers(UUID issueId){
+    public List<IssueWatcher> getIssueWatchers(UUID issueId) {
         Issue issue = issueAccessService.getIssue(issueId);
         List<IssueWatcher> watchers = issueWatcherRepository.findByIssueId(issueId);
         return watchers;
     }
 
 
-    public  List<EmailRecipient> getWatcherEmailRecipients(UUID issueId, UUID userId){
-        return issueWatcherRepository.findWatcherEmailRecipients(issueId,userId);
+    public List<EmailRecipient> getWatcherEmailRecipients(UUID issueId, UUID userId) {
+        return issueWatcherRepository.findWatcherEmailRecipients(issueId, userId);
     }
 
 }

@@ -9,5 +9,5 @@ public record LabelAddedEvent(UUID issueId,
                               UUID projectId,
                               String labelName,
                               String issueTitle
-                              ) {
+) {
 }

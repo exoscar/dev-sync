@@ -22,19 +22,19 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     long countByWorkspaceId(UUID workspaceId);
 
     @Query(value = """
-SELECT
-    p.id AS id,
-    p.name AS name,
-    ts_rank(
-        p.search_vector,
-        websearch_to_tsquery('english', :query)
-    ) AS rank
-FROM project p
-WHERE p.workspace_id = :workspaceId
-AND p.search_vector @@ websearch_to_tsquery('english', :query)
-ORDER BY rank DESC
-LIMIT 15
-""",nativeQuery = true)
-    List<ProjectSearchProjection> searchProjects(   @Param("workspaceId") UUID workspaceId,@Param("query") String query);
+            SELECT
+                p.id AS id,
+                p.name AS name,
+                ts_rank(
+                    p.search_vector,
+                    websearch_to_tsquery('english', :query)
+                ) AS rank
+            FROM project p
+            WHERE p.workspace_id = :workspaceId
+            AND p.search_vector @@ websearch_to_tsquery('english', :query)
+            ORDER BY rank DESC
+            LIMIT 15
+            """, nativeQuery = true)
+    List<ProjectSearchProjection> searchProjects(@Param("workspaceId") UUID workspaceId, @Param("query") String query);
 
 }

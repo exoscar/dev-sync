@@ -6,9 +6,14 @@ import java.util.UUID;
 
 public interface IssueSearchProjection {
     UUID getId();
+
     String getTitle();
+
     IssueStatus getStatus();
+
     UUID getProjectId();
+
     String getProjectName();
+
     Float getRank();
 }

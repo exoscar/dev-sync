@@ -14,15 +14,13 @@ import org.devsync.spring.common.exception.BusinessException;
 import org.devsync.spring.common.exception.ErrorCode;
 import org.devsync.spring.common.security.CurrentUserService;
 import org.devsync.spring.common.util.Utils;
+import org.devsync.spring.infrastructure.outbox.service.OutboxService;
 import org.devsync.spring.issue.entity.Issue;
 import org.devsync.spring.issue.repository.IssueRepository;
 import org.devsync.spring.issue.service.IssueValidationService;
 import org.devsync.spring.project.entity.Project;
 import org.devsync.spring.project.service.ProjectAccessService;
-import org.devsync.spring.project.service.ProjectValidationService;
-import org.devsync.spring.workspace.entity.Workspace;
 import org.devsync.spring.workspace.entity.WorkspaceMember;
-import org.devsync.spring.workspace.entity.WorkspaceRole;
 import org.devsync.spring.workspace.repository.WorkspaceMemberRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -47,6 +45,7 @@ public class CommentService {
     private final CommentAuthorizationService authorizationService;
     private final IssueValidationService issueValidationService;
     private final ApplicationEventPublisher eventPublisher;
+    private final OutboxService outboxService;
 
     @Transactional
     public CommentResponse createComment(String issueId, @Valid CreateCommentRequest request) {
@@ -62,7 +61,7 @@ public class CommentService {
                 member.getUser(),
                 ActivityType.COMMENT_ADDED,
                 "Added a Comment");
-        eventPublisher.publishEvent(new CommentCreatedEvent(
+        CommentCreatedEvent event = new CommentCreatedEvent(
                 issueUUID,
                 comment.getId(),
                 member.getUser().getId(),
@@ -70,31 +69,34 @@ public class CommentService {
                 issue.getProject().getId(),
                 member.getUser().getFirstName(),
                 issue.getTitle()
-        ));
+        );
+        eventPublisher.publishEvent(event);
+        outboxService.save("ISSUE", issue.getId(), "COMMENT_CREATED", event);
         return mapToCommentResponse(comment);
     }
 
 
-    public Page<CommentResponse> getComments(String issueId,int page,int size) {
-        UUID issueUUID =  issueValidationService.parseIssueId(issueId);
+    public Page<CommentResponse> getComments(String issueId, int page, int size) {
+        UUID issueUUID = issueValidationService.parseIssueId(issueId);
         Issue issue = getIssue(issueUUID);
         projectAccessService.getCurrentProjectMember(issue.getProject());
-        Pageable pageable = PageRequest.of(page,size, Sort.by(Sort.Direction.ASC, "createdAt"));
-        Page<Comment> comments = commentRepository.findByIssueId(issueUUID,pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
+        Page<Comment> comments = commentRepository.findByIssueId(issueUUID, pageable);
         return comments.map(this::mapToCommentResponse);
     }
+
     @Transactional
     public CommentResponse updateComment(String commentId, @Valid UpdateCommentRequest updateCommentRequest) {
         UUID commentUUID = parseCommentId(commentId);
-        Comment comment = commentRepository.findById(commentUUID).orElseThrow(()->
-                new BusinessException("Comment not found",ErrorCode.NOT_FOUND));
+        Comment comment = commentRepository.findById(commentUUID).orElseThrow(() ->
+                new BusinessException("Comment not found", ErrorCode.NOT_FOUND));
         Project project = comment.getIssue().getProject();
         WorkspaceMember member = projectAccessService.getCurrentProjectMember(project);
-        authorizationService.requireCommentManagePermission(member,comment);
+        authorizationService.requireCommentManagePermission(member, comment);
         String content =
                 updateCommentRequest.getContent().trim();
 
-        if(content.equals(comment.getContent())){
+        if (content.equals(comment.getContent())) {
             throw new BusinessException(
                     "Comment content is unchanged",
                     ErrorCode.BAD_REQUEST
@@ -109,13 +111,13 @@ public class CommentService {
     }
 
     @Transactional
-    public void deleteComment(String commentId){
+    public void deleteComment(String commentId) {
         UUID commentUUID = parseCommentId(commentId);
-        Comment comment = commentRepository.findById(commentUUID).orElseThrow(()->
-                new BusinessException("Comment not found",ErrorCode.NOT_FOUND));
+        Comment comment = commentRepository.findById(commentUUID).orElseThrow(() ->
+                new BusinessException("Comment not found", ErrorCode.NOT_FOUND));
         Project project = comment.getIssue().getProject();
         WorkspaceMember member = projectAccessService.getCurrentProjectMember(project);
-       authorizationService.requireCommentManagePermission(member,comment);
+        authorizationService.requireCommentManagePermission(member, comment);
         issueActivityService.recordActivity(comment.getIssue(),
                 member.getUser(),
                 ActivityType.COMMENT_DELETED,
@@ -124,7 +126,7 @@ public class CommentService {
     }
 
 
-    private CommentResponse mapToCommentResponse(Comment comment){
+    private CommentResponse mapToCommentResponse(Comment comment) {
         return CommentResponse.builder()
                 .id(comment.getId())
                 .content(comment.getContent())
@@ -136,7 +138,6 @@ public class CommentService {
     }
 
 
-
     private UUID parseCommentId(String id) {
         return Utils.parseUuid(id, "Invalid Comment Id");
     }
@@ -146,8 +147,6 @@ public class CommentService {
                 () -> new BusinessException("Issue not found", ErrorCode.NOT_FOUND)
         );
     }
-
-
 
 
 }

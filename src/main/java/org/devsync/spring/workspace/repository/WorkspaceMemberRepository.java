@@ -19,10 +19,10 @@ public interface WorkspaceMemberRepository extends JpaRepository<WorkspaceMember
     List<WorkspaceMember> findByWorkspaceId(UUID workspaceId);
 
     @Query("""
-    select wm.workspace
-    from WorkspaceMember wm
-    where wm.user.id = :userId
-""")
+                select wm.workspace
+                from WorkspaceMember wm
+                where wm.user.id = :userId
+            """)
     List<Workspace> findWorkspacesByUserId(UUID userId);
 
 

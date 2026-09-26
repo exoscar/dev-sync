@@ -22,28 +22,28 @@ public class IssueWatcherController {
 
     @Operation(summary = "Watch Issue")
     @PostMapping("/me")
-    public ApiResponse<WatcherResponse> watchIssue(@PathVariable String issueId){
+    public ApiResponse<WatcherResponse> watchIssue(@PathVariable String issueId) {
         WatcherResponse response = issueWatcherService.watchIssue(issueId);
         return ApiResponseUtil.success(response);
     }
 
     @Operation(summary = "Unwatch Issue")
     @DeleteMapping("/me")
-    public ApiResponse<Void> unwatchIssue(@PathVariable String issueId){
+    public ApiResponse<Void> unwatchIssue(@PathVariable String issueId) {
         issueWatcherService.unwatchIssue(issueId);
         return ApiResponseUtil.success("Issue unwatched");
     }
 
     @Operation(summary = "Get Issue Watchers")
     @GetMapping()
-    public ApiResponse<List<WatcherResponse>> getWatcher(@PathVariable String issueId){
+    public ApiResponse<List<WatcherResponse>> getWatcher(@PathVariable String issueId) {
         List<WatcherResponse> watchers = issueWatcherService.getWatchers(issueId);
         return ApiResponseUtil.success(watchers);
     }
 
     @Operation(summary = "Check is Watching")
     @GetMapping("/me")
-    public ApiResponse<WatchStatusResponse> isWatching(@PathVariable String issueId){
+    public ApiResponse<WatchStatusResponse> isWatching(@PathVariable String issueId) {
         WatchStatusResponse response = issueWatcherService.isWatching(issueId);
         return ApiResponseUtil.success(response);
     }

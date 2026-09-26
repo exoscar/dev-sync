@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.devsync.spring.common.entity.BaseEntity;
 import org.devsync.spring.workspace.entity.Workspace;
-import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
@@ -13,7 +12,7 @@ import java.util.UUID;
 @Table(
         name = "labels",
         uniqueConstraints = {
-                @UniqueConstraint(  name = "uk_label_workspace_name",
+                @UniqueConstraint(name = "uk_label_workspace_name",
                         columnNames = {
                                 "workspace_id",
                                 "normalized_name"

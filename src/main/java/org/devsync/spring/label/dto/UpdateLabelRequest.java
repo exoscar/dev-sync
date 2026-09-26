@@ -14,12 +14,10 @@ import lombok.NoArgsConstructor;
 public class UpdateLabelRequest {
     @NotBlank
     String name;
-
+    String description;
     @NotBlank
     @Pattern(
             regexp = "^#(?:[A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$"
     )
     private String color;
-
-    String description;
 }

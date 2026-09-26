@@ -14,7 +14,7 @@ import java.util.UUID;
 @Table(uniqueConstraints = {
         @UniqueConstraint(
                 columnNames = {
-                        "workspace_id","user_id"
+                        "workspace_id", "user_id"
                 }
         )
 })

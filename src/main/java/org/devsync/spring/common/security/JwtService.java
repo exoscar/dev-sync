@@ -29,7 +29,7 @@ public class JwtService {
         );
     }
 
-    public String generateAccessToken(UUID userId){
+    public String generateAccessToken(UUID userId) {
         long now = System.currentTimeMillis();
         String jti = UUID.randomUUID().toString();
         return Jwts.builder()
@@ -41,11 +41,11 @@ public class JwtService {
                 .compact();
     }
 
-    public Claims extractClaims(String token){
+    public Claims extractClaims(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
     }
 
-    public UUID extractUserId(String token){
+    public UUID extractUserId(String token) {
         return UUID.fromString(
                 extractClaims(token).getSubject()
         );

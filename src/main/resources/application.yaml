@@ -67,3 +67,9 @@ app:
     expiration-ms: 90000000
   storage:
     upload-dir: uploads
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus

@@ -29,18 +29,18 @@ public class Notification extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY,optional = false)
-    @JoinColumn(name = "recipient_id",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "recipient_id", nullable = false)
     private User recipient;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private NotificationType type;
 
-    @Column(nullable = false,length = 100)
+    @Column(nullable = false, length = 100)
     private String title;
 
-    @Column(nullable = false,length = 500)
+    @Column(nullable = false, length = 500)
     private String message;
 
     @Column(nullable = false)

@@ -8,16 +8,11 @@ import org.devsync.spring.notification.dto.CreateNotificationRequest;
 import org.devsync.spring.notification.dto.NotificationResponse;
 import org.devsync.spring.notification.dto.UnreadCountResponse;
 import org.devsync.spring.notification.entity.Notification;
-import org.devsync.spring.notification.entity.NotificationType;
-import org.devsync.spring.notification.entity.ResourceType;
 import org.devsync.spring.notification.event.UnreadNotificationEvent;
 import org.devsync.spring.notification.mapper.NotificationMapper;
 import org.devsync.spring.notification.repository.NotificationRepository;
 import org.devsync.spring.project.entity.Project;
 import org.devsync.spring.project.service.ProjectAccessService;
-import org.devsync.spring.watcher.entity.IssueWatcher;
-import org.devsync.spring.watcher.service.IssueWatcherAccessService;
-import org.devsync.spring.watcher.service.IssueWatcherService;
 import org.devsync.spring.workspace.entity.Workspace;
 import org.devsync.spring.workspace.service.WorkspaceAccessService;
 import org.springframework.context.ApplicationEventPublisher;
@@ -76,9 +71,9 @@ public class NotificationService {
     public UnreadCountResponse getUnreadCount() {
         UUID currUserId = currentUserService.getCurrentUserId();
         Optional<Long> cache = unreadNotificationCache.get(currUserId);
-        if(cache.isEmpty()){
+        if (cache.isEmpty()) {
             long count = repository.countByRecipientIdAndIsReadFalse(currUserId);
-            unreadNotificationCache.put(currUserId,count);
+            unreadNotificationCache.put(currUserId, count);
             return mapper.toRespone(count);
         }
 
@@ -86,11 +81,11 @@ public class NotificationService {
     }
 
     @Transactional
-    public void markRead(String notificationId){
+    public void markRead(String notificationId) {
         UUID notificationUUID = validationService.parseNotificationId(notificationId);
         UUID currUserId = currentUserService.getCurrentUserId();
-        Notification notification = accessService.getAccessibleNotification(notificationUUID,currUserId);
-        if(notification.isRead()){
+        Notification notification = accessService.getAccessibleNotification(notificationUUID, currUserId);
+        if (notification.isRead()) {
             return;
         }
         notification.setRead(true);
@@ -103,10 +98,10 @@ public class NotificationService {
     }
 
     @Transactional
-    public void markAllRead(){
+    public void markAllRead() {
         UUID currUserId = currentUserService.getCurrentUserId();
         Instant now = Instant.now();
-        repository.markAllRead(currUserId,now);
+        repository.markAllRead(currUserId, now);
         applicationEventPublisher.publishEvent(
                 new UnreadNotificationEvent(
                         currUserId
@@ -115,9 +110,9 @@ public class NotificationService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void createNotification(CreateNotificationRequest request){
-       List<User> recipients = request.getRecipients();
-       List<Notification> notifications = recipients.stream().map(user -> {
+    public void createNotification(CreateNotificationRequest request) {
+        List<User> recipients = request.getRecipients();
+        List<Notification> notifications = recipients.stream().map(user -> {
             Notification notification = new Notification();
             notification.setMessage(request.getMessage());
             notification.setTitle(request.getTitle());
@@ -128,7 +123,7 @@ public class NotificationService {
             notification.setType(request.getNotificationType());
             notification.setResourceId(request.getResourceId());
             return notification;
-       }).toList();
+        }).toList();
 
         repository.saveAll(notifications);
         repository.flush();
