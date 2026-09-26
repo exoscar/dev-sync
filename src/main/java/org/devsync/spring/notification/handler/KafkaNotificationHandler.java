@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.devsync.spring.auth.entity.User;
 import org.devsync.spring.auth.repository.UserRepository;
+import org.devsync.spring.infrastructure.kafka.entity.KafkaConsumerType;
 import org.devsync.spring.infrastructure.kafka.entity.ProcessedKafkaEvent;
+import org.devsync.spring.infrastructure.kafka.entity.ProcessedKafkaEventId;
 import org.devsync.spring.infrastructure.kafka.event.*;
 import org.devsync.spring.infrastructure.kafka.repository.ProcessedKafkaEventRespository;
 import org.devsync.spring.notification.dto.CreateNotificationRequest;
@@ -31,8 +33,12 @@ public class KafkaNotificationHandler {
 
     @Transactional
     public void handle(KafkaNotificationEvent event) {
-
-        if (processedKafkaEventRepository.existsById(event.eventId())) {
+        ProcessedKafkaEventId id =
+                new ProcessedKafkaEventId(
+                        event.eventId(),
+                        KafkaConsumerType.NOTIFICATION.name()
+                );
+        if (processedKafkaEventRepository.existsById(id)) {
             log.info(
                     "Kafka event already processed: eventId={}",
                     event.eventId()
@@ -68,7 +74,10 @@ public class KafkaNotificationHandler {
         }
 
         processedKafkaEventRepository.save(
-                new ProcessedKafkaEvent(event.eventId())
+                new ProcessedKafkaEvent(
+                        event.eventId(),
+                        KafkaConsumerType.NOTIFICATION.name()
+                )
         );
     }
 
@@ -94,9 +103,6 @@ public class KafkaNotificationHandler {
                         .build();
 
         notificationService.createNotification(request);
-        processedKafkaEventRepository.save(
-                new ProcessedKafkaEvent(event.eventId())
-        );
     }
 
     private void handleIssueStatusChanged(
